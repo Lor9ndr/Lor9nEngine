@@ -2,8 +2,7 @@
 
 AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-Application app  = new Application();
-app.Run();
+using Application app = new Application();
 
 
 void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs args)

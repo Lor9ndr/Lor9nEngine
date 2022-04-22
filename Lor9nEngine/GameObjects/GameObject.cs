@@ -1,12 +1,11 @@
 ﻿using Lor9nEngine.Components;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
+
 using Newtonsoft.Json;
-using OpenTK.Graphics.OpenGL4;
 
 namespace Lor9nEngine.GameObjects
 {
-    [Serializable]
 
     internal class GameObject : IGameObject
     {
@@ -21,20 +20,20 @@ namespace Lor9nEngine.GameObjects
                 if (value is not null)
                 {
                     _parent = value;
-                    Transform = new ParentedTransform(Transform,Parent);
+                    Transform = new ParentedTransform(Transform, Parent);
                 }
             }
         }
         public Model Model { get; set; }
 
         [JsonConstructor]
-        public GameObject(Model model,Transform transform, IGameObject? parent = null)
+        public GameObject(Model model, Transform transform, IGameObject? parent = null)
         {
             Model = model;
             Transform = transform;
             _parent = parent;
         }
-     
+
         public void Render(Shader shader)
         {
             EngineGL.Instance.UseShader(shader);

@@ -2,16 +2,13 @@
 using Lor9nEngine.GameObjects;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
-using Lor9nEngine.Rendering.Interfaces;
-using OpenTK.Graphics.OpenGL4;
+
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using System;
 
 namespace Lor9nEngine
 {
-    [Serializable]
     internal class Camera : IGameObject
     {
         public float CameraSpeed
@@ -41,7 +38,7 @@ namespace Lor9nEngine
         private float _fov = MathHelper.PiOver2;
         private bool disposedValue;
 
-        public Model Model { get;set; }
+        public Model Model { get; set; }
         public List<IGameObject> Childrens { get; set; }
         public IGameObject Parent { get; set; }
         public ITransform Transform { get; set; }
@@ -72,7 +69,7 @@ namespace Lor9nEngine
             window.MouseMove -= Window_MouseMove;
             _keyboard = null;
         }
-      
+
         private void HandleKeyBoard()
         {
             if (_keyboard == null)

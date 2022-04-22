@@ -1,12 +1,8 @@
-﻿using Lor9nEngine.Rendering.Interfaces;
+﻿using System.Runtime.InteropServices;
+
+using Lor9nEngine.Rendering.Interfaces;
+
 using OpenTK.Graphics.OpenGL4;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lor9nEngine.Rendering.Base.Buffers
 {
@@ -32,7 +28,7 @@ namespace Lor9nEngine.Rendering.Base.Buffers
         {
             EngineGL.Instance.GenBuffer(out _handle);
             Bind();
-            EngineGL.Instance.BufferData(BufferTarget.PixelPackBuffer,Game.Width * Game.Height * sizeof(float), (IntPtr)0,BufferUsageHint.StreamRead);
+            EngineGL.Instance.BufferData(BufferTarget.PixelPackBuffer, Game.Width * Game.Height * sizeof(float), (IntPtr)0, BufferUsageHint.StreamRead);
             return this;
         }
         public IBufferObject Setup(int dataSize, IntPtr scan)
@@ -68,7 +64,7 @@ namespace Lor9nEngine.Rendering.Base.Buffers
             if (result == (int)ArbSync.Signaled)
             {
 
-                tex.Pbos[tex.CurrentPboIndex +1].Bind();
+                tex.Pbos[tex.CurrentPboIndex + 1].Bind();
 
                 var mappedBuffer = GL.MapBuffer(BufferTarget.PixelPackBuffer, BufferAccess.ReadOnly);
                 //Texture.Memcpy(tex.Pointer, mappedBuffer, (int)tex.DataSize);
@@ -89,6 +85,6 @@ namespace Lor9nEngine.Rendering.Base.Buffers
 
         [DllImport("kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
         public static extern void CopyMemory(IntPtr dest, IntPtr src, int count);
-       
+
     }
 }

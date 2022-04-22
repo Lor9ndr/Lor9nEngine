@@ -28,7 +28,7 @@ namespace Lor9nEngine.Scenes
             }
         }
 
-      
+
         private static T ReadFromJsonFile<T>(string filePath)
         {
             using var sr = new StreamReader(filePath);
@@ -41,7 +41,7 @@ namespace Lor9nEngine.Scenes
             serializer.TypeNameHandling = TypeNameHandling.Auto;
             return serializer.Deserialize<T>(jsonReader);
         }
-          
+
 
         public static void SaveScene(Scene scene)
         {

@@ -1,7 +1,8 @@
 ﻿using Lor9nEngine.GameObjects;
 using Lor9nEngine.Rendering;
+
 using Newtonsoft.Json;
-using OpenTK.Graphics.OpenGL4;
+
 using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Components
@@ -21,7 +22,7 @@ namespace Lor9nEngine.Components
         public Vector3 Scale { get => _scale; set => _scale = value; }
         public Matrix4 Model { get => _model; set => _model = value; }
         public IGameObject Parent => _parent;
-        public ParentedTransform(Vector3 position,IGameObject parent)
+        public ParentedTransform(Vector3 position, IGameObject parent)
         {
             _position = position;
             _scale = new Vector3(1);
@@ -69,13 +70,13 @@ namespace Lor9nEngine.Components
             var r2 = Matrix4.CreateRotationY(Rotation.Y);
             var r3 = Matrix4.CreateRotationZ(Rotation.Z);
             var s = Matrix4.CreateScale(Scale);
-            Model = Parent.Transform.Model *  (r1 * r2 * r3 * s * t1);
+            Model = Parent.Transform.Model * (r1 * r2 * r3 * s * t1);
             await Task.CompletedTask;
         }
 
         public void Update()
         {
-          
+
         }
 
         public void Dispose()

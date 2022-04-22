@@ -1,12 +1,14 @@
 ﻿using Lor9nEngine.Rendering.Interfaces;
+
 using Newtonsoft.Json;
+
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 
 namespace Lor9nEngine.Rendering.Animate
 {
-    internal class Animator: IRenderable,IUpdatable
+    internal class Animator : IRenderable, IUpdatable
     {
         private readonly List<Matrix4> _finalBoneMatrices;
         private Animation? _currentAnimation;

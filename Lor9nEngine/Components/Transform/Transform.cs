@@ -1,12 +1,11 @@
-﻿using Lor9nEngine.GameObjects;
-using Lor9nEngine.Rendering;
+﻿using Lor9nEngine.Rendering;
+
 using Newtonsoft.Json;
-using OpenTK.Graphics.OpenGL4;
+
 using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Components
 {
-    [Serializable]
 
     internal class Transform : ITransform
     {
@@ -31,7 +30,7 @@ namespace Lor9nEngine.Components
         }
 
 
-        public Transform(Vector3 position,  Vector3 rotation)
+        public Transform(Vector3 position, Vector3 rotation)
             : this(position) => _rotation = rotation;
         [JsonConstructor]
         public Transform(Vector3 position, Vector3 rotation, Vector3 scale)

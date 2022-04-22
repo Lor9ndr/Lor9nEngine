@@ -17,7 +17,7 @@ namespace Lor9nEngine.Rendering.Base
                 ObjectSetupper = new ObjectSetupper(vertices);
             }
         }
-      
+
         public BaseGLObject(IObjectSetupper objectSetupper) => ObjectSetupper = objectSetupper;
 
         public virtual void Render(Shader shader)

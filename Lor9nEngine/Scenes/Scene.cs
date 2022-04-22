@@ -1,11 +1,11 @@
 ﻿using Lor9nEngine.GameObjects;
 using Lor9nEngine.GameObjects.Lights;
 using Lor9nEngine.Rendering;
+
 using Newtonsoft.Json;
 
 namespace Lor9nEngine.Scenes
 {
-    [Serializable]
     internal class Scene
     {
         public string Name { get; set; }
@@ -15,7 +15,7 @@ namespace Lor9nEngine.Scenes
         public SkyBox SkyBox => GameObjects.OfType<SkyBox>().FirstOrDefault();
         public Camera Camera => GameObjects.OfType<Camera>().First();
         [JsonConstructor]
-        public Scene(string name,List<IGameObject> gameObjects)
+        public Scene(string name, List<IGameObject> gameObjects)
         {
             Name = name;
             GameObjects = gameObjects;
@@ -52,13 +52,13 @@ namespace Lor9nEngine.Scenes
         }
         public void RenderObjects(IEnumerable<IGameObject> gameObjects, Shader shader)
         {
-            EngineGL.Instance.UseShader(shader); 
+            EngineGL.Instance.UseShader(shader);
             foreach (var go in gameObjects)
             {
                 go.Render(shader);
             }
         }
-        public void RenderLightBoxes(IEnumerable<ILight> lights, Shader shader) 
+        public void RenderLightBoxes(IEnumerable<ILight> lights, Shader shader)
         {
             SetupCamera(Camera, shader);
             RenderObjects(lights, shader);

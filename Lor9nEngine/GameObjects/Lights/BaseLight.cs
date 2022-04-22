@@ -2,22 +2,21 @@
 using Lor9nEngine.Components.Light;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
-using Lor9nEngine.Rendering.Interfaces;
+
 using Newtonsoft.Json;
-using OpenTK.Graphics.OpenGL4;
+
 using OpenTK.Mathematics;
 
 namespace Lor9nEngine.GameObjects.Lights
 {
-    [Serializable]
 
     internal class BaseLight : ILight
     {
-        public LightData LightData { get;set;}
-        public Model Model { get;set; } 
-        public List<IGameObject> Childrens { get;set;} = new List<IGameObject>();
-        public IGameObject Parent { get;set;}
-        public ITransform Transform { get;set; }
+        public LightData LightData { get; set; }
+        public Model Model { get; set; }
+        public List<IGameObject> Childrens { get; set; } = new List<IGameObject>();
+        public IGameObject Parent { get; set; }
+        public ITransform Transform { get; set; }
         public BaseLight(LightData lightData, Model model)
         {
             Model = model;
@@ -26,7 +25,7 @@ namespace Lor9nEngine.GameObjects.Lights
         }
 
         [JsonConstructor]
-        public BaseLight(LightData lightData, Model model, Transform transform) 
+        public BaseLight(LightData lightData, Model model, Transform transform)
             : this(lightData, model)
         {
             Transform = transform;

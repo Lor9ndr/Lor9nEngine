@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Lor9nEngine.Rendering.Textures
+﻿namespace Lor9nEngine.Rendering.Textures
 {
     public enum TextureType
     {

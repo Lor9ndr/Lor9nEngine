@@ -1,5 +1,6 @@
 ﻿using Lor9nEngine.Rendering.Base.Buffers;
 using Lor9nEngine.Rendering.Textures;
+
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -11,7 +12,7 @@ namespace Lor9nEngine.Rendering.Interfaces
         /// Тип текстуры
         /// </summary>
         public TextureType Type { get; set; }
-        public TextureTarget Target { get;set;}
+        public TextureTarget Target { get; set; }
         /// <summary>
         /// Путь текстуры
         /// </summary>

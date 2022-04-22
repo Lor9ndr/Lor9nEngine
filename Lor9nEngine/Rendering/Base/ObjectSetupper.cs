@@ -1,7 +1,9 @@
-﻿using Lor9nEngine.Rendering.Base.Buffers;
+﻿using System.Runtime.InteropServices;
+
+using Lor9nEngine.Rendering.Base.Buffers;
 using Lor9nEngine.Rendering.Interfaces;
+
 using OpenTK.Graphics.OpenGL4;
-using System.Runtime.InteropServices;
 
 namespace Lor9nEngine.Rendering.Base
 {
@@ -9,7 +11,7 @@ namespace Lor9nEngine.Rendering.Base
     {
         private bool _disposedValue = false;
         private Vertex[] _vertices;
-        public VAO Vao { get; init;}
+        public VAO Vao { get; init; }
 
         public VBO Vbo { get; init; }
 
@@ -24,11 +26,11 @@ namespace Lor9nEngine.Rendering.Base
         public ObjectSetupper(Vertex[] vertices)
         {
             VerticesCount = vertices.Length;
-           
+
             Vao = (VAO)new VAO().Setup();
             Vbo = (VBO)new VBO().Setup(vertices);
 
-            
+
             _vertices = vertices;
             EngineGL.Instance.BindVAO(Vao);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vertex.Size, Marshal.OffsetOf<Vertex>("Position"));

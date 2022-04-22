@@ -1,20 +1,19 @@
 ﻿using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Interfaces;
-using OpenTK.Graphics.OpenGL4;
+
 using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Components.Light
 {
-    [Serializable]
 
     internal class LightData : IComponent
     {
 
-        public Vector3 Ambient { get;set;}
-        public Vector3 Diffuse { get;set;}
-        public Vector3 Specular { get;set;}
-        public Vector3 Color { get;set;}
-        public float Intensity { get;set;} = 10.0f;
+        public Vector3 Ambient { get; set; }
+        public Vector3 Diffuse { get; set; }
+        public Vector3 Specular { get; set; }
+        public Vector3 Color { get; set; }
+        public float Intensity { get; set; } = 10.0f;
         public LightData(Vector3 ambient, Vector3 diffuse, Vector3 specular, Vector3 color)
         {
             Ambient = ambient;

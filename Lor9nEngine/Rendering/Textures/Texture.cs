@@ -1,5 +1,6 @@
 ﻿
-using Assimp.Unmanaged;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 using Lor9nEngine.Rendering.Base.Buffers;
 using Lor9nEngine.Rendering.Interfaces;
@@ -9,12 +10,6 @@ using Newtonsoft.Json;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-
-using static System.Net.Mime.MediaTypeNames;
-
 using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
 
 
@@ -23,10 +18,9 @@ namespace Lor9nEngine.Rendering.Textures
     /// <summary>
     /// Класс текстур
     /// </summary>
-    [Serializable]
     internal class Texture : ITexture
     {
-        private Vector2i _size = new Vector2i(800,600);
+        private Vector2i _size = new Vector2i(800, 600);
 
         private int _handle;
         private PBO[] _pbos;
@@ -34,7 +28,7 @@ namespace Lor9nEngine.Rendering.Textures
         public TextureType Type { get; set; } = TextureType.Diffuse;
         public string Path { get; set; } = Directory.GetCurrentDirectory();
         public int Handle { get => _handle; set => _handle = value; }
-        public TextureTarget Target { get;set; } = TextureTarget.Texture2D;
+        public TextureTarget Target { get; set; } = TextureTarget.Texture2D;
 
         public int DataSize => Size.X * Size.Y * Channels;
 
@@ -44,7 +38,7 @@ namespace Lor9nEngine.Rendering.Textures
         public IntPtr Pointer { get; set; }
         public PBO[] Pbos { get => _pbos; set => _pbos = value; }
 
-        public int CurrentPboIndex { get;set; }
+        public int CurrentPboIndex { get; set; }
 
         /// <summary>
         /// Конструктор текстуры, где сразу определяется идентификатор текстуры
@@ -62,7 +56,7 @@ namespace Lor9nEngine.Rendering.Textures
         public Texture(int id, TextureType type, string path)
             : this(id, type) => Path = path;
         public Texture(int id, TextureType type, string path, TextureTarget target = TextureTarget.Texture2D)
-        : this(id, type,path) => Target = target;
+        : this(id, type, path) => Target = target;
 
         /// <summary>
         /// Базовый конструктор текстуры, создаваемый только с помощью идентификтора текстуры
@@ -98,14 +92,14 @@ namespace Lor9nEngine.Rendering.Textures
             // Load the image
             try
             {
-                var pointer  = IntPtr.Zero;
+                var pointer = IntPtr.Zero;
                 using (Bitmap image = new Bitmap(path))
                 {
                     BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
                    ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-                    
-                    
+
+
                     EngineGL.Instance.GenTexture(out _handle);
                     GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.SrgbAlpha, image.Width, image.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
 
@@ -116,7 +110,7 @@ namespace Lor9nEngine.Rendering.Textures
                           .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat)
                           ;
                     GL.BindTexture(TextureTarget.Texture2D, 0);
-                    
+
                     Size = new Vector2i(image.Width, image.Height);
                     Type = type;
                     Pointer = data.Scan0;
@@ -160,7 +154,7 @@ namespace Lor9nEngine.Rendering.Textures
 
                     size = new Vector2i(image.Width, image.Height);
                     var pointer = data.Scan0;
-                    GL.BindTexture(TextureTarget.Texture2D,handle);
+                    GL.BindTexture(TextureTarget.Texture2D, handle);
 
                     GL.TexImage2D(TextureTarget.Texture2D,
                                 0,
@@ -278,12 +272,12 @@ namespace Lor9nEngine.Rendering.Textures
         /// Обычная diffuse текстура
         /// </summary>
         public static ITexture GetDefaultTexture = LoadFromFile(Game.TEXTURES_PATH + "/DefaultBase.jpg", TextureType.Diffuse, string.Empty);
-        
+
         /// <summary>
         /// Пустая текстура нормалей
         /// </summary>
         public static ITexture GetDefaultNormalTexture = LoadFromFile(Game.TEXTURES_PATH + "/EmptyNormal.png", TextureType.Normal, string.Empty);
-        
+
         /// <summary>
         /// Список текстуры цвета и нормалей
         /// </summary>
@@ -303,13 +297,13 @@ namespace Lor9nEngine.Rendering.Textures
             return obj is ITexture && Handle.Equals(((ITexture)obj).Handle);
         }
 
-       
+
 
         public void Bind() => Bind(TextureTarget.Texture2D);
 
         public void Unbind() => Unbind(TextureTarget.Texture2D);
 
-      
+
         /// <summary>
         /// Освобождение памяти
         /// </summary>
@@ -317,6 +311,6 @@ namespace Lor9nEngine.Rendering.Textures
         {
             GL.DeleteTexture(Handle);
         }
-       
+
     }
 }

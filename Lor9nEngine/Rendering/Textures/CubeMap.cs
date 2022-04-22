@@ -1,14 +1,16 @@
-﻿using Lor9nEngine.Rendering.Base.Buffers;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+
+using Lor9nEngine.Rendering.Base.Buffers;
 using Lor9nEngine.Rendering.Interfaces;
+
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using System.Drawing;
-using System.Drawing.Imaging;
+
 using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
 
 namespace Lor9nEngine.Rendering.Textures
 {
-    [Serializable]
     internal class CubeMap : ITexture
     {
         private int _handle;
@@ -16,7 +18,7 @@ namespace Lor9nEngine.Rendering.Textures
         public string Path { get; set; } = Directory.GetCurrentDirectory();
         public int Handle { get => _handle; set => _handle = value; }
         public PBO[] PBOs { get; set; }
-        public TextureTarget Target { get;set; }
+        public TextureTarget Target { get; set; }
         public Vector2i Size { get; set; }
         public int DataSize { get => Size.X * Size.Y * Channels; }
         public int Channels { get => 6; }
@@ -91,7 +93,7 @@ namespace Lor9nEngine.Rendering.Textures
                         .TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge)
                         .TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
             GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
-            var cubeMap = new CubeMap(handle, type, TextureTarget.TextureCubeMap) { Size = size};
+            var cubeMap = new CubeMap(handle, type, TextureTarget.TextureCubeMap) { Size = size };
             return cubeMap;
         }
 

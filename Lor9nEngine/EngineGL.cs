@@ -1,13 +1,11 @@
-﻿using Lor9nEngine.Rendering;
-using Lor9nEngine.Rendering.Base.Buffers;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.FrameBuffer;
 using Lor9nEngine.Rendering.Interfaces;
-using Lor9nEngine.Rendering.Textures;
+
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Lor9nEngine
 {
@@ -20,7 +18,7 @@ namespace Lor9nEngine
         private CullFaceMode _currentCullFaceMode;
         private IGLObject _bindedVao;
 
-      
+
 
         private bool _depthMask;
         private Shader _activeShader;
@@ -196,7 +194,7 @@ namespace Lor9nEngine
             }
         }
 
-       
+
 
         /// <summary>
         /// Активный шейдер
@@ -280,9 +278,9 @@ namespace Lor9nEngine
             GL.DepthFunc(function);
             return this;
         }
-        internal EngineGL DepthRange(float near ,float far)
+        internal EngineGL DepthRange(float near, float far)
         {
-            GL.DepthRange(near,far);
+            GL.DepthRange(near, far);
             return this;
         }
         internal EngineGL ClearDepth(double value)
@@ -367,7 +365,7 @@ namespace Lor9nEngine
         internal EngineGL BindVAO(int vao = 0)
         {
             GL.BindVertexArray(vao);
-            
+
             BindedVao = null;
             return this;
         }
@@ -384,7 +382,7 @@ namespace Lor9nEngine
         }
         internal EngineGL UnbindBuffer(BufferTarget target)
         {
-            GL.BindBuffer(target,0);
+            GL.BindBuffer(target, 0);
             return this;
         }
 
@@ -705,7 +703,7 @@ namespace Lor9nEngine
         /// <returns></returns>
         internal EngineGL GenTexture(out int tex)
         {
-             tex = GL.GenTexture();
+            tex = GL.GenTexture();
             return this;
         }
 

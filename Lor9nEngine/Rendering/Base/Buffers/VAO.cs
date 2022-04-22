@@ -1,9 +1,10 @@
 ﻿using Lor9nEngine.Rendering.Interfaces;
+
 using OpenTK.Graphics.OpenGL4;
 
 namespace Lor9nEngine.Rendering.Base.Buffers
 {
-    internal class VAO : IBufferVerticesObject 
+    internal class VAO : IBufferVerticesObject
     {
         private int _handle;
 

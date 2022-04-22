@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System.Collections.Generic;
 
 namespace Lor9nEngine.Rendering.Animate
 {

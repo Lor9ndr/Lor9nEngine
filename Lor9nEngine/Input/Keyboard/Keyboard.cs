@@ -1,15 +1,11 @@
 ﻿using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Lor9nEngine
 {
     /// <summary>
     /// Класс отвечающий за клавиатуру
     /// </summary>
-    [Serializable]
     public class Keyboard
     {
         /// <summary>
@@ -68,7 +64,7 @@ namespace Lor9nEngine
             }
             else if (type == PressType.Up)
             {
-                BindOnKeyUp(key,action);
+                BindOnKeyUp(key, action);
             }
             else
             {

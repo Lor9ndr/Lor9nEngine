@@ -1,7 +1,9 @@
-﻿using Lor9nEngine.Rendering.Base.Buffers;
+﻿using System.Runtime.InteropServices;
+
+using Lor9nEngine.Rendering.Base.Buffers;
 using Lor9nEngine.Rendering.Interfaces;
+
 using OpenTK.Graphics.OpenGL4;
-using System.Runtime.InteropServices;
 
 namespace Lor9nEngine.Rendering.Base
 {
@@ -21,7 +23,7 @@ namespace Lor9nEngine.Rendering.Base
         public int VerticesCount { get; init; }
         public bool HasIndices => IndicesCount > 0;
         public Vertex[] Vertices { get => _vertices; set => _vertices = value; }
-        public int[] Indices { get => _indices; set => _indices = value;}
+        public int[] Indices { get => _indices; set => _indices = value; }
 
         public IndicedObjectSetupper(Vertex[] vertices, int[] indices)
         {
@@ -72,7 +74,7 @@ namespace Lor9nEngine.Rendering.Base
         {
             Vao.Bind();
             EngineGL.Instance.BindBuffer(BufferTarget.ElementArrayBuffer, Ebo)
-                            .DrawElements(PrimitiveType.Triangles,IndicesCount,DrawElementsType.UnsignedInt,0);
+                            .DrawElements(PrimitiveType.Triangles, IndicesCount, DrawElementsType.UnsignedInt, 0);
             Vao.Unbind();
         }
 

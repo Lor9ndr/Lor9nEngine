@@ -1,16 +1,17 @@
 ﻿using Assimp;
-using Assimp.Configs;
+
 using Lor9nEngine.Extensions;
 using Lor9nEngine.Rendering.Animate;
 using Lor9nEngine.Rendering.Interfaces;
 using Lor9nEngine.Rendering.Textures;
+
 using Newtonsoft.Json;
+
 using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Rendering.Base
 {
 
-    [Serializable]
     internal class Model : IRenderable, IUpdatable
     {
 
@@ -153,7 +154,7 @@ namespace Lor9nEngine.Rendering.Base
             {
                 Animator?.Render();
             }
-            
+
             for (int i = 0; i < Meshes.Count; i++)
             {
                 Meshes[i].Render(shader);
@@ -257,7 +258,7 @@ namespace Lor9nEngine.Rendering.Base
         private List<ITexture> LoadMaterialTexture(Material mat, Assimp.TextureType type, Textures.TextureType typeName)
         {
             List<ITexture> textures = new();
-            
+
             for (int i = 0; i < mat.GetMaterialTextureCount(type); i++)
             {
                 mat.GetMaterialTexture(type, i, out TextureSlot str);

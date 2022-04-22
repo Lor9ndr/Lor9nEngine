@@ -1,10 +1,7 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
-
+﻿
 using Lor9nEngine.Rendering.Base.Buffers;
 using Lor9nEngine.Rendering.Interfaces;
-using Lor9nEngine.Rendering.Textures;
-using Newtonsoft.Json;
+
 using OpenTK.Graphics.OpenGL4;
 
 namespace Lor9nEngine.Rendering.Base
@@ -22,7 +19,7 @@ namespace Lor9nEngine.Rendering.Base
         public string Name { get => _name; set => _name = value; }
 
 
-        public Mesh(Vertex[] vertices,string name, List<ITexture>? textures = null, int[]? indices = default) 
+        public Mesh(Vertex[] vertices, string name, List<ITexture>? textures = null, int[]? indices = default)
             : base(vertices, indices)
         {
             id++;
@@ -34,7 +31,7 @@ namespace Lor9nEngine.Rendering.Base
             Name = name;
         }
         public Mesh(string name, IObjectSetupper baseSetupper, List<ITexture>? textures = null)
-            :base(baseSetupper)
+            : base(baseSetupper)
         {
             id++;
             _currentId = id;
@@ -45,7 +42,7 @@ namespace Lor9nEngine.Rendering.Base
             Name = name;
         }
 
-        public Mesh(Mesh item) 
+        public Mesh(Mesh item)
             : base(item.ObjectSetupper)
         {
             id++;
@@ -53,7 +50,7 @@ namespace Lor9nEngine.Rendering.Base
             _name = $"{item.Name}({_currentId})";
         }
 
-      
+
         public override void Render(Shader shader)
         {
             ObjectSetupper.Vao.Bind();
@@ -89,7 +86,7 @@ namespace Lor9nEngine.Rendering.Base
             }
             PBO pbo = tex.Pbos[tex.CurrentPboIndex];
             pbo.Process(tex);
-         
+
         }
 
         public override void Dispose()
@@ -101,6 +98,6 @@ namespace Lor9nEngine.Rendering.Base
             base.Dispose();
         }
 
-           
+
     }
 }

@@ -1,17 +1,18 @@
 ﻿using Lor9nEngine.Rendering.Interfaces;
 using Lor9nEngine.Rendering.Textures;
+
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Rendering.FrameBuffer
 {
-    internal class FrameBuffer:IGLObject
+    internal class FrameBuffer : IGLObject
     {
         private Vector2i _size;
         private readonly ClearBufferMask _bufferMask;
         private int _handle;
         private ITexture _texture;
-       
+
         /// <summary>
         /// Идентификатор буффера
         /// </summary>
@@ -70,17 +71,17 @@ namespace Lor9nEngine.Rendering.FrameBuffer
             Clear();
         }
 
-       /* /// <summary>
-        /// Отображать буффер в текущий буффер
-        /// В основном для отладки,но рекомендую юзать приложение RenderDoc
-        /// </summary>
-        /// <param name="texID">какую текстуру отображаем</param>
-        public void DisplayFrameBufferTexture(int texID)
-        {
-            _debugShader.Use();
-            EngineGL.Instance.ActiveTexture(TextureUnit.Texture0).BindTexture(TextureTarget.Texture2D, texID);
-            _debugQuad.Draw(PrimitiveType.TrianglesAdjacency);
-        }*/
+        /* /// <summary>
+         /// Отображать буффер в текущий буффер
+         /// В основном для отладки,но рекомендую юзать приложение RenderDoc
+         /// </summary>
+         /// <param name="texID">какую текстуру отображаем</param>
+         public void DisplayFrameBufferTexture(int texID)
+         {
+             _debugShader.Use();
+             EngineGL.Instance.ActiveTexture(TextureUnit.Texture0).BindTexture(TextureTarget.Texture2D, texID);
+             _debugQuad.Draw(PrimitiveType.TrianglesAdjacency);
+         }*/
 
         /// <summary>
         /// Проверка состояния буффера кадра, при создании самого буффера кадра

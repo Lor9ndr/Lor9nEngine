@@ -6,7 +6,6 @@ namespace Lor9nEngine.Rendering
     /// <summary>
     /// Класс шейдера
     /// </summary>
-    [Serializable]
     public class Shader : IDisposable
     {
         /// <summary>

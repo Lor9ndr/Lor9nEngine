@@ -1,16 +1,14 @@
 ﻿using Assimp;
+
 using Lor9nEngine.Extensions;
 using Lor9nEngine.Rendering.Base;
+
 using Newtonsoft.Json;
+
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace Lor9nEngine.Rendering.Animate
 {
-    [Serializable]
     internal class Animation
     {
         private readonly float _duration;

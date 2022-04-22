@@ -160,7 +160,7 @@ vec3 CalcPointLight(PointLight light, vec3 defaultNormal, vec3 defaultViewDir, v
 	// calculate per-light radiance
     vec3 L = light.position - fs_in.TangentFragPos;
     L *= fs_in.TBN;
-    float distance    = length(L);
+    float distance  = length(L);
     L = normalize(L);
     float NdotL = max(dot(defaultNormal, L), 0.0);
     float attenuation = 0;

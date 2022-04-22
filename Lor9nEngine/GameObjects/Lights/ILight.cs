@@ -1,11 +1,4 @@
-﻿using Lor9nEngine.GameObjects;
-using Lor9nEngine.Rendering;
-using Lor9nEngine.Rendering.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Lor9nEngine.Rendering;
 
 namespace Lor9nEngine.GameObjects.Lights
 {

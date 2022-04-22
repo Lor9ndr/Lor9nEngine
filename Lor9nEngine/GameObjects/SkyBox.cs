@@ -3,14 +3,14 @@ using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
 using Lor9nEngine.Rendering.Interfaces;
 using Lor9nEngine.Rendering.Textures;
+
 using Newtonsoft.Json;
+
 using OpenTK.Graphics.OpenGL4;
 
 namespace Lor9nEngine.GameObjects
 {
-    [Serializable]
-
-    internal class SkyBox:IGameObject
+    internal class SkyBox : IGameObject
     {
         private readonly Shader _skyBoxShader = new Shader(Game.SKYBOX_SHADER_PATH + ".vs", Game.SKYBOX_SHADER_PATH + ".fr");
 
@@ -57,7 +57,7 @@ namespace Lor9nEngine.GameObjects
         new Vertex(-1.0f, -1.0f,  1.0f),
         new Vertex( 1.0f, -1.0f,  1.0f)
     };
-        public readonly string[] faces = 
+        public readonly string[] faces =
         {
             "right.jpg",
             "left.jpg",
@@ -69,8 +69,8 @@ namespace Lor9nEngine.GameObjects
         private CubeMap _cubemapTexture;
         private bool disposedValue;
 
-        public Model Model { get;set;}
-        public List<IGameObject> Childrens { get; set ; }
+        public Model Model { get; set; }
+        public List<IGameObject> Childrens { get; set; }
         public IGameObject Parent { get; set; }
         public ITransform Transform { get; set; }
 
@@ -79,7 +79,7 @@ namespace Lor9nEngine.GameObjects
         {
             _cubemapTexture = CubeMap.LoadCubeMapFromFile(faces, TextureType.Skybox);
             ResizeVerticesToSkybox();
-            Model = new Model(new Mesh(skyboxVertices,"SkyBox", textures: new List<ITexture>() {_cubemapTexture }), "SkyBox");
+            Model = new Model(new Mesh(skyboxVertices, "SkyBox", textures: new List<ITexture>() { _cubemapTexture }), "SkyBox");
             EngineGL.Instance.UseShader(_skyBoxShader).SetShaderData("skybox", 0);
         }
         private void ResizeVerticesToSkybox()

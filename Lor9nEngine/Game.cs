@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+
 using Lor9nEngine.Components;
 using Lor9nEngine.Components.Light;
 using Lor9nEngine.GameObjects;
@@ -6,6 +7,7 @@ using Lor9nEngine.GameObjects.Lights;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.FrameBuffer;
 using Lor9nEngine.Scenes;
+
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.ImGui;
 using OpenTK.Mathematics;
@@ -94,9 +96,9 @@ namespace Lor9nEngine
         private Scene _currentScene;
         private int _currentTexture;
         private readonly object _locker = new object();
-        private IGLFWGraphicsContext context {get; set; }
+        private IGLFWGraphicsContext context { get; set; }
 
-        public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) 
+        public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
             : base(gameWindowSettings, nativeWindowSettings)
         {
         }
@@ -116,7 +118,7 @@ namespace Lor9nEngine
             CancellationToken = CancellationTokenSource.Token;
 
             EngineGL.Instance.Enable(EnableCap.FramebufferSrgb);
-            UpdateAsync = new Thread(async() =>
+            UpdateAsync = new Thread(async () =>
             {
                 while (!CancellationToken.IsCancellationRequested)
                 {
@@ -126,13 +128,13 @@ namespace Lor9nEngine
                     }
                     Thread.Sleep(1);
                 }
-              
+
             });
             UpdateAsync.Start();
 
             MainShader = new Shader(DEFAULT_SHADER + ".vert", DEFAULT_SHADER + ".frag");
             LightBoxShader = new Shader(SHADERS_PATH + "LightBoxShader/LightBox.vert", SHADERS_PATH + "LightBoxShader/LightBox.frag");
-            
+
             base.OnLoad();
 
         }
@@ -141,11 +143,11 @@ namespace Lor9nEngine
             if (scene == null)
             {
                 GameObjects.Clear();
-                Camera = new Camera(new Vector3(10), Size.X/(float)Size.Y);
+                Camera = new Camera(new Vector3(10), Size.X / (float)Size.Y);
                 Camera.Enable(this);
                 GameObjects.Add(Camera);
                 GameObjects.Add(new DirectLight(new LightData(new Vector3(0.25f), new Vector3(0.5f), new Vector3(0.5f), new Vector3(1)), new Vector3(1), ModelFactory.GetLightModel()));
-                var tr = new Transform(new Vector3(-10, -10, 10), new Vector3(0),  new Vector3(0.5f));
+                var tr = new Transform(new Vector3(-10, -10, 10), new Vector3(0), new Vector3(0.5f));
                 GameObjects.Add(new GameObject(ModelFactory.GetTerrainModel(), tr));
                 GameObjects.Add(new GameObject(ModelFactory.GetDancingVampire(), new Transform(new Vector3(0), new Vector3(0), new Vector3(10))));
                 GameObjects.Add(new SkyBox());
@@ -174,7 +176,7 @@ namespace Lor9nEngine
             // DEBUG RENDER LIGHT GAMEOBJECT SHADER
             _currentScene.RenderLightBoxes(LightBoxShader);
 
-            
+
             if (_isGuiVisible)
             {
                 onDrawGUI();
@@ -195,7 +197,7 @@ namespace Lor9nEngine
             {
                 item.Update();
             }
-          
+
             EngineGL.Instance.UseShader(MainShader).SetShaderData("enableLight", EnableLight);
 
             _time += args.Time;
@@ -218,7 +220,7 @@ namespace Lor9nEngine
         {
             CancellationTokenSource.Cancel();
             base.OnUnload();
-          
+
         }
         protected override void OnClosed()
         {
@@ -309,7 +311,7 @@ namespace Lor9nEngine
 
                 ImGui.EndMainMenuBar();
             }
-            
+
 
             List<IGameObject> gos = new List<IGameObject>();
             gos.AddRange(GameObjects);
@@ -327,7 +329,7 @@ namespace Lor9nEngine
             {
 
             }
-           
+
             else if (ImGui.Begin("Properties", ref _opened, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.AlwaysUseWindowPadding))
             {
                 ImGui.Text("Transform");
@@ -351,7 +353,7 @@ namespace Lor9nEngine
                 var direct = new System.Numerics.Vector3(direction.X, direction.Y, direction.Z);
                 ImGui.DragFloat3("Direction", ref direct, 0.1f);
                 obj.Transform.Direction = new Vector3(direct.X, direct.Y, direct.Z);
-             
+
 
                 if (obj is Camera)
                 {
@@ -416,9 +418,9 @@ namespace Lor9nEngine
                     {
                         _selectedMesh = 0;
                     }
-                   
+
                 }
-              
+
             }
             if (obj.Model != null && obj is not SkyBox)
             {
