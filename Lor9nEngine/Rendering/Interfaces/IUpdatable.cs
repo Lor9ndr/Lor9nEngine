@@ -1,6 +1,6 @@
 ﻿namespace Lor9nEngine.Rendering.Interfaces
 {
-    internal interface IUpdatable
+    public interface IUpdatable
     {
         public void Update();
         public Task UpdateAsync();

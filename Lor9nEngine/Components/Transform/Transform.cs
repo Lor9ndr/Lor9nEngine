@@ -1,13 +1,13 @@
 ﻿using Lor9nEngine.Rendering;
+using Lor9nEngine.Rendering.Interfaces;
 
 using Newtonsoft.Json;
 
 using OpenTK.Mathematics;
 
-namespace Lor9nEngine.Components
+namespace Lor9nEngine.Components.Transform
 {
-
-    internal class Transform : ITransform
+    public class Transform : ITransform
     {
         private Vector3 _position;
         private Vector3 _rotation;
@@ -65,6 +65,11 @@ namespace Lor9nEngine.Components
         }
 
         public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IRenderable.RenderWithOutTextures(Shader shader)
         {
             throw new NotImplementedException();
         }

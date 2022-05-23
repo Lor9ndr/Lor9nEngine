@@ -4,7 +4,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace Lor9nEngine.Rendering.Base.Buffers
 {
-    internal class VAO : IBufferVerticesObject
+    public class VAO : IBufferVerticesObject
     {
         private int _handle;
 

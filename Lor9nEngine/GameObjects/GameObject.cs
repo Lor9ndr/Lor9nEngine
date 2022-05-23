@@ -1,8 +1,6 @@
-﻿using Lor9nEngine.Components;
+﻿using Lor9nEngine.Components.Transform;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
-
-using Newtonsoft.Json;
 
 namespace Lor9nEngine.GameObjects
 {
@@ -12,7 +10,7 @@ namespace Lor9nEngine.GameObjects
         private IGameObject? _parent;
         public ITransform Transform { get; set; }
         public List<IGameObject> Childrens { get; set; } = new List<IGameObject>();
-        public IGameObject Parent
+        public IGameObject? Parent
         {
             get => _parent;
             set
@@ -20,13 +18,12 @@ namespace Lor9nEngine.GameObjects
                 if (value is not null)
                 {
                     _parent = value;
-                    Transform = new ParentedTransform(Transform, Parent);
+                    Transform = new ParentedTransform(Transform, Parent!);
                 }
             }
         }
         public Model Model { get; set; }
 
-        [JsonConstructor]
         public GameObject(Model model, Transform transform, IGameObject? parent = null)
         {
             Model = model;
@@ -60,6 +57,18 @@ namespace Lor9nEngine.GameObjects
         public void Dispose()
         {
             Model.Dispose();
+        }
+
+        public void RenderWithOutTextures(Shader shader)
+        {
+            EngineGL.Instance.UseShader(shader);
+            Transform.Render(shader);
+            Model.RenderWithOutTextures(shader);
+        }
+
+        public void RenderModel(Shader shader)
+        {
+            Render(shader);
         }
     }
 }

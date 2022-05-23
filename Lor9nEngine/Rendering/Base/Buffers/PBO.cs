@@ -6,7 +6,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace Lor9nEngine.Rendering.Base.Buffers
 {
-    internal struct PBO : IBufferObject
+    public struct PBO : IBufferObject
     {
         private int _handle;
 

@@ -1,5 +1,7 @@
 ﻿#version 460 core
 
+#define NUM_SAMPLES 20
+#define NUM_SAMPLESF 20.0
 
 out vec4 FragColor;
 
@@ -20,7 +22,10 @@ struct DirectLight {
     vec3 direction;
     vec3 color;
     float intensity;
-  
+
+    mat4 LightSpaceMatrix;
+	sampler2D shadow;
+
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -37,6 +42,9 @@ struct PointLight {
     float linear;
     float quadratic;  
 
+    samplerCube shadow;
+	float farPlane;
+
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -45,6 +53,10 @@ struct PointLight {
 struct SpotLight {
     vec3 position;
     vec3 direction;
+
+    vec3 color;
+    float intensity;
+
     float cutOff;
     float outerCutOff;
   
@@ -52,6 +64,10 @@ struct SpotLight {
     float linear;
     float quadratic;
   
+    mat4 LightSpaceMatrix;
+	sampler2D shadow;
+	float farPlane;
+
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;       
@@ -68,9 +84,11 @@ in VS_OUT {
 
 vec3 CalcDirLight(DirectLight light, vec3 normal, vec3 viewDir,vec3 diffColor, vec3 specColor,vec3 F0, float roughness, float metallic);
 vec3 CalcPointLight(PointLight light, vec3 defaultNormal, vec3 defaultViewDir,vec3 diffColor, vec3 specColor,vec3 F0, float roughness, float metallic);
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir,vec3 diffColor, vec3 specColor,vec3 F0, float roughness, float metallic);
 
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-
+float SpotLightShadowCalculation(SpotLight light, vec3 normal, vec3 lightDir);
+float ShadowDirectCalculation(DirectLight light, vec3 lightDir);
+float ShadowPointCalculation(PointLight light,vec3 normal, vec3 lightDir);
 //PBR
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
@@ -82,12 +100,22 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0);
 float LinearizeDepth(float depth);
 
 uniform DirectLight directLight;
-uniform SpotLight spotlights[10];
-uniform PointLight pointLights[10];
+uniform SpotLight spotLights[30];
+uniform PointLight pointLights[30];
 uniform Material material;
 uniform int nrSpotLights;
 uniform int nrPointLights;
 uniform bool enableLight;
+
+
+vec3 sampleOffsetDirections[NUM_SAMPLES] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
 
 const float PI = 3.14159265359;
 const float near = 0.1;
@@ -117,14 +145,14 @@ void main()
     float gamma = 1.3;
 
     vec3 result = vec3(0);
-    result = CalcDirLight(directLight, tanNormal, tanviewDir, diffuseMap, specularMap,F0, roughness, metallic);
+    result += CalcDirLight(directLight, tanNormal, tanviewDir, diffuseMap, specularMap,F0, roughness, metallic);
      // phase 2: point lights
     for(int i = 0; i < nrPointLights; i++)
-        result += CalcPointLight(pointLights[i],  defaultNormal,  defaultViewDir, diffuseMap, specularMap, F0, roughness, metallic); 
+        result += CalcPointLight(pointLights[i],  tanNormal, tanviewDir, diffuseMap, specularMap, F0, roughness, metallic); 
    
-   //// phase 3: spot light
-   //for(int i = 0; i < nrSpotLights; i++)
-   //    result += CalcSpotLight(spotlights[i], norm,  fs_in.FragPos, viewDir);    
+    // phase 3: spot light
+     for(int i = 0; i < nrSpotLights; i++)
+          result += CalcSpotLight(spotLights[i], tanNormal, tanviewDir, diffuseMap, specularMap, F0, roughness, metallic);
     FragColor = vec4(result,1.0);
 }
 
@@ -149,69 +177,83 @@ vec3 CalcDirLight(DirectLight light, vec3 normal, vec3 viewDir, vec3 diffColor, 
     vec3 kD = vec3(1.0) - kS;
       
     kD *= 1.0 - metallic;
-    kD *= light.diffuse;
 
-    float NdotL = max(dot(normal, L), 0.0);        
-    return (kD * diffColor / PI + specular) * radiance * NdotL * light.intensity;
+    float NdotL = max(dot(normal, L), 0.0);  
+    float shadow = ShadowDirectCalculation(light, L);
+    return ((1.0 - shadow) * (kD * diffColor / PI + specular)) * radiance * NdotL * light.intensity;
 }  
 
-vec3 CalcPointLight(PointLight light, vec3 defaultNormal, vec3 defaultViewDir, vec3 diffColor, vec3 specColor,vec3 F0, float roughness, float metallic)
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir, vec3 diffColor, vec3 specColor,vec3 F0, float roughness, float metallic)
 {
 	// calculate per-light radiance
     vec3 L = light.position - fs_in.TangentFragPos;
     L *= fs_in.TBN;
-    float distance  = length(L);
+    float distance  = length(-L);
     L = normalize(L);
-    float NdotL = max(dot(defaultNormal, L), 0.0);
+    float NdotL = max(dot(normal, L), 0.0);
     float attenuation = 0;
     if (NdotL > 0)
     {
          attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic*(distance * distance));
     }
-    vec3 H = normalize(defaultViewDir + L);
+    vec3 H = normalize(viewDir + L);
     vec3 radiance     = light.color * attenuation * light.intensity;
     
     // cook-torrance brdf
-    float NDF = DistributionGGX(defaultNormal, H, roughness);
-    float G   = GeometrySmith(defaultNormal, defaultViewDir, L, roughness);
-    vec3 F    = fresnelSchlick(max(dot(H, defaultViewDir), 0.0), F0);
+    float NDF = DistributionGGX(normal, H, roughness);
+    float G   = GeometrySmith(normal, viewDir, L, roughness);
+    vec3 F    = fresnelSchlick(max(dot(H, viewDir), 0.0), F0);
     
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;	  
     
     vec3 numerator    = NDF * G * F;
-    float denominator = 4.0 * max(dot(defaultNormal, defaultViewDir), 0.0) * max(dot(defaultNormal, L), 0.0) + 0.0001;
+    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, L), 0.0) + 0.0001;
     vec3 specular     = numerator / denominator;  
-        
 
-    return (kD * diffColor / PI + specular) * radiance * NdotL; 
+    float shadow = ShadowPointCalculation(light,  normal, L);
+
+    return ((1.0 - shadow) * (kD * diffColor / PI + specular)) * radiance * NdotL; 
 } 
 // calculates the color when using a spot light.
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir,vec3 diffColor, vec3 specColor,vec3 F0, float roughness, float metallic)
 {
-    vec3 lightDir = normalize( light.position - fragPos);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // attenuation
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    // spotlight intensity
-    float theta = dot(lightDir, normalize(-light.direction)); 
-    float epsilon = light.cutOff - light.outerCutOff;
+    
+    // calculate per-light radiance
+    vec3 L = light.position - fs_in.FragPos ;
+    float distance  = length(fs_in.FragPos - light.position);
+    L = normalize(L);
+    float NdotL = max(dot(normal, L), 0.0);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic*(distance * distance));
+    // Spotlight (soft edges)
+    float theta = dot(L, normalize(-light.direction));
+    float epsilon = (light.cutOff - light.outerCutOff);
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-    // combine results
-    vec3 ambient  = light.ambient  * vec3(texture(material.Diffuse, fs_in.TexCoords));
-    vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.Diffuse, fs_in.TexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(material.Specular, fs_in.TexCoords));
-    ambient *= attenuation * intensity;
-    diffuse *= attenuation * intensity;
-    specular *= attenuation * intensity;
-    return (ambient + diffuse + specular);
-}
+
+	
+    vec3 H = normalize(viewDir + L);
+    vec3 radiance     = light.color * attenuation * light.intensity * intensity;
+    
+    // cook-torrance brdf
+    float NDF = DistributionGGX(normal, H, roughness);
+    float G   = GeometrySmith(normal, viewDir, L, roughness);
+    vec3 F    = fresnelSchlick(max(dot(H, viewDir), 0.0), F0);
+    
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;	  
+    
+    vec3 numerator    = NDF * G * F;
+    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, L), 0.0) + 0.0001;
+    vec3 specular     = numerator / denominator;  
+    float shadow = SpotLightShadowCalculation(light,  normal, L);
+
+    return ((1.0 - shadow) * (kD * diffColor / PI + specular)) * radiance * NdotL; 
+} 
+        
+
+
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a = roughness*roughness;
@@ -250,4 +292,112 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+
+float SpotLightShadowCalculation(SpotLight light, vec3 normal, vec3 lightDir)
+{
+	// perform perspective divide
+	vec4 fragPosLightSpace = light.LightSpaceMatrix * vec4(fs_in.FragPos, 1.0);
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(light.shadow, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // calculate bias (based on depth map resolution and slope)
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir*2)), 0.05);
+    // check whether current frag pos is in shadow
+    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+    // PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(light.shadow, 0);
+	if (fragPosLightSpace.w > 1)
+	{
+		 for(int x = -1; x <= 1; ++x)
+		{
+			for(int y = -1; y <= 1; ++y)
+			{
+				float pcfDepth = texture(light.shadow, projCoords.xy + vec2(x, y) * texelSize).r; 
+				shadow += currentDepth - bias >= pcfDepth  ? 1.0 : 0.0;        
+			}
+		}
+		shadow /= 9.0;
+	}
+   
+    
+    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+    if(projCoords.z >= 1.0)
+        shadow = 1.0;
+        
+    return shadow;
+}
+
+float ShadowDirectCalculation(DirectLight light, vec3 lightDir)
+{
+	vec4 fragPosLightSpace = light.LightSpaceMatrix * vec4(fs_in.FragPos, 1.0);
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(light.shadow, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // calculate bias (based on depth map resolution and slope)
+    vec3 normal = normalize(fs_in.Normal);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    // check whether current frag pos is in shadow
+    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+    // PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(light.shadow, 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(light.shadow, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
+    
+    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+        
+    return shadow;
+}
+
+
+
+float ShadowPointCalculation(PointLight light,vec3 normal, vec3 lightDir)
+{
+	// get vector from the light to the fragment
+	vec3 lightToFrag = fs_in.FragPos - light.position;
+
+	// get current depth
+	float currentDepth = length(lightToFrag);
+
+	// calculate bias
+	float minBias = 0.005;
+	float maxBias = 0.05;
+	float bias = max(maxBias * (1.0 - dot(normal, lightDir)), minBias);
+
+	// PCF
+	float shadow = 0.0;
+	float viewDist = length(viewPos);
+	float diskRadius = (1.0 + (viewDist / light.farPlane)) / 30.0;
+	for (int i = 0; i < NUM_SAMPLES; i++) {
+		float pcfDepth = texture(light.shadow, lightToFrag + sampleOffsetDirections[i] * diskRadius).r;
+		pcfDepth *= light.farPlane;
+
+		if (currentDepth - bias >= pcfDepth) {
+			shadow += 1.0;
+		}
+	}
+
+	shadow /= NUM_SAMPLESF;
+
+	return shadow;
 }

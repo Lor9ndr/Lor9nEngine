@@ -7,14 +7,14 @@ namespace Lor9nEngine.Scenes
         public const string FILE_EXTENSION = ".lor";
         public const string FILENAME = "Scene";
 
-        private static async void WriteToJsonFile<T>(string filePath, T objectToWrite)
+        private static async Task WriteToJsonFile<T>(string filePath, T objectToWrite)
         {
             if (!File.Exists(filePath))
             {
                 var read = File.Create(filePath);
                 read.Close();
             }
-            using (StreamWriter sw = new StreamWriter(filePath))
+            await using (StreamWriter sw = new StreamWriter(filePath))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 var serializer = new JsonSerializer();
@@ -47,7 +47,7 @@ namespace Lor9nEngine.Scenes
         {
             Thread t = new Thread(async () =>
             {
-                WriteToJsonFile(@"Scenes\" + scene.Name + FILE_EXTENSION, scene);
+                await WriteToJsonFile(@"Scenes\" + scene.Name + FILE_EXTENSION, scene);
             });
             t.Start();
         }

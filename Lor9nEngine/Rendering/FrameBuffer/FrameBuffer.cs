@@ -3,10 +3,11 @@ using Lor9nEngine.Rendering.Textures;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 
 namespace Lor9nEngine.Rendering.FrameBuffer
 {
-    internal class FrameBuffer : IGLObject
+    public class FrameBuffer : IGLObject, ISettupable
     {
         private Vector2i _size;
         private readonly ClearBufferMask _bufferMask;
@@ -21,12 +22,28 @@ namespace Lor9nEngine.Rendering.FrameBuffer
         /// <summary>
         /// Размер буффера
         /// </summary>
-        public Vector2i Size { get => _size; set => _size = value; }
+        public Vector2i Size
+        {
+            get
+            {
+                return _size;
+            }
+            set
+            {
+                if (value != _size)
+                {
+                    _size = value;
+                    OnResize.Invoke(new ResizeEventArgs(_size));
+                }
+            }
+        }
 
         /// <summary>
         /// Текстура буффера
         /// </summary>
         public ITexture Texture { get => _texture; }
+
+        public event Action<ResizeEventArgs> OnResize;
 
 
         /// <summary>
@@ -39,20 +56,36 @@ namespace Lor9nEngine.Rendering.FrameBuffer
             _size = size;
             _bufferMask = bufferMask;
             Handle = 0;
+            OnResize += Resize;
+        }
+
+        protected virtual void Resize(ResizeEventArgs e)
+        {
+            this.Size = e.Size;
+            SetViewPort();
         }
 
         /// <summary>
         /// Привязываем буффер кадра
         /// </summary>
-        public void Bind() => EngineGL.Instance.BindFramebuffer(FramebufferTarget.Framebuffer, this);
+        public void Bind()
+        {
+            //Console.WriteLine($"BINDING FBO {Handle}");
+            EngineGL.Instance.BindFramebuffer(FramebufferTarget.Framebuffer, this);
+        }
 
         /// <summary>
         /// Отвязываем буффер кадра
         /// </summary>
-        public void Unbind() => EngineGL.Instance.BindFramebuffer(FramebufferTarget.Framebuffer, EmptyFrameBuffer);
+        public void Unbind()
+        {
+            //Console.WriteLine($"UNBINDING FBO {Handle}");
+
+            EngineGL.Instance.BindFramebuffer(FramebufferTarget.Framebuffer, EmptyFrameBuffer);
+        }
 
         /// <summary>
-        /// не
+        /// Настройка Фреймбуффера - его генерация
         /// </summary>
         public void Setup() => EngineGL.Instance.GenFramebuffer(out _handle);
 
@@ -114,7 +147,7 @@ namespace Lor9nEngine.Rendering.FrameBuffer
         /// <param name="type">Тип пикслей</param>
         public void AttachCubeMap(FramebufferAttachment attachment, PixelInternalFormat format, PixelType type)
         {
-            _texture = new CubeMap();
+            _texture = new CubeMap(TextureType.Shadow) { Size = Size };
             _texture.SetTexParameters(Size, format, type);
             EngineGL.Instance.FramebufferTexture(FramebufferTarget.Framebuffer, attachment, _texture, 0);
             CheckState();
@@ -129,7 +162,7 @@ namespace Lor9nEngine.Rendering.FrameBuffer
         /// <param name="type">Тип пикслей</param>
         public void AttachTexture2DMap(FramebufferAttachment attachment, PixelInternalFormat format, PixelType type)
         {
-            _texture = new Texture();
+            _texture = new Texture2D(TextureType.Shadow) { Size = Size };
             _texture.SetTexParameters(Size, format, type);
             EngineGL.Instance.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, TextureTarget.Texture2D, _texture, 0);
             CheckState();

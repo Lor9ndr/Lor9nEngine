@@ -53,7 +53,7 @@ namespace Lor9nEngine
         new Vertex(new Vector3( 1.0f, -1.0f,  1.0f), new Vector2(0.0f, 1.0f))
     };
         private static readonly Mesh _mesh = new Mesh(_cubeVertices, "Cube");
-        private static readonly ITexture _lightTexture = Texture.LoadFromFile(Game.TEXTURES_PATH + "/blub.png", TextureType.Diffuse, string.Empty);
+        private static readonly ITexture _lightTexture = Texture2D.LoadFromFile(Game.TEXTURES_PATH + "/blub.png", TextureType.Diffuse, string.Empty);
         public static Model GetTexturedCube(ITexture texture)
         {
             var textures = new List<ITexture>() { texture };
@@ -62,7 +62,7 @@ namespace Lor9nEngine
         public static Model GetLightModel() => GetTexturedCube(_lightTexture);
         public static Model GetSphere = new(Game.OBJ_PATH + "Sphere.obj");
         public static Model GetCube() => new Model(_mesh, "Cube");
-        public static Model GetDefaultCube = new Model(_mesh, Texture.GetDefaultTextures, "Cube");
+        public static Model GetDefaultCube = new Model(_mesh, Texture2D.GetDefaultTextures, "Cube");
         public static Model GetNanoSuitModel() => new(Game.NANOSUIT_PATH);
         public static Model GetBridgeModel() => new(Game.BRIDGE_PATH);
         public static Model GetManModel() => new(Game.MAN_PATH);

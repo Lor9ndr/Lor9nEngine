@@ -2,7 +2,7 @@
 
 namespace Lor9nEngine.Rendering.Interfaces
 {
-    internal interface IBufferObject : IGLObject
+    public interface IBufferObject : IGLObject
     {
         public IBufferObject Setup();
         public void Bind(BufferTarget target);

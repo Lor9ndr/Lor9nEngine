@@ -9,7 +9,7 @@ using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Rendering.Animate
 {
-    internal class Animation
+    public class Animation
     {
         private readonly float _duration;
         private readonly float _ticksPerSecond;

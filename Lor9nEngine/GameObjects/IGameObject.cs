@@ -1,14 +1,18 @@
 ﻿using Lor9nEngine.Components;
+using Lor9nEngine.Components.Transform;
+using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
 using Lor9nEngine.Rendering.Interfaces;
 
 namespace Lor9nEngine.GameObjects
 {
-    internal interface IGameObject : IRenderable, IUpdatable, IDisposable
+    public interface IGameObject : IRenderable, IUpdatable, IDisposable
     {
-        public Model Model { get; set; }
-        public List<IGameObject> Childrens { get; set; }
-        public IGameObject Parent { get; set; }
-        public ITransform Transform { get; set; }
+        Model Model { get; set; }
+        List<IGameObject> Childrens { get; set; }
+        IGameObject? Parent { get; set; }
+        ITransform Transform { get; set; }
+        public void RenderModel(Shader shader);
+
     }
 }

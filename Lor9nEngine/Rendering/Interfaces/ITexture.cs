@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Rendering.Interfaces
 {
-    internal interface ITexture : IGLObject
+    public interface ITexture : IGLObject
     {
         /// <summary>
         /// Тип текстуры
@@ -35,9 +35,8 @@ namespace Lor9nEngine.Rendering.Interfaces
         /// Приатачить текстуру к юниту и забиндить её 
         /// </summary>
         /// <param name="unit">На какой юнит коннектить текстуру</param>
-        /// <param name="taget">Целевой тип текстуры</param>
-        public void Use(TextureUnit unit, TextureTarget taget)
-            => EngineGL.Instance.ActiveTexture(unit).BindTexture(taget, this);
+        /// <param name="target">Целевой тип текстуры</param>
+        public void Use(TextureUnit unit, TextureTarget target) => EngineGL.Instance.ActiveTexture(unit).BindTexture(target, this);
 
         /// <summary>
         /// Отвязка текстуры
@@ -72,7 +71,7 @@ namespace Lor9nEngine.Rendering.Interfaces
         /// <param name="anotherFormat">Формат пикселей</param>
         public void SetTexParameters(Vector2i size, PixelInternalFormat format, PixelFormat anotherFormat, PixelType type)
         {
-            Bind(TextureTarget.Texture2D);
+            Bind(Target);
             float[] borderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
             EngineGL.Instance.TexImage2D(TextureTarget.Texture2D, 0, format, size.X, size.Y, 0, anotherFormat, type, (IntPtr)null)
                         .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear)
@@ -82,6 +81,8 @@ namespace Lor9nEngine.Rendering.Interfaces
                         .GenerateMipmap(GenerateMipmapTarget.Texture2D)
                         .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBorderColor, borderColor);
             GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
+            Unbind();
+
         }
     }
 }

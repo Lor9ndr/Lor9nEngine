@@ -56,8 +56,8 @@ void main()
 
     vec4 modelxTotalPos = model * vec4(totalPosition.xyz, 1.0f);
     mat3 normalMatrix = transpose(inverse(mat3(model)));
-    vec3 T = normalize(vec3(model * vec4(aTangent, 0.0)));
-    vec3 N = normalize(vec3(model * vec4(localNormal, 0.0)));
+    vec3 T = normalize(vec3(model * vec4(aTangent, 1.0)));
+    vec3 N = normalize(vec3(model * vec4(aNormal, 1.0)));
     // re-orthogonalize T with respect to N
     T = normalize(T - dot(T, N) * N);
     // then retrieve perpendicular vector B with the cross product of T and N

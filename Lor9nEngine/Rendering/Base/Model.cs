@@ -5,14 +5,14 @@ using Lor9nEngine.Rendering.Animate;
 using Lor9nEngine.Rendering.Interfaces;
 using Lor9nEngine.Rendering.Textures;
 
-using Newtonsoft.Json;
+using NLog;
 
 using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Rendering.Base
 {
 
-    internal class Model : IRenderable, IUpdatable
+    public class Model : IRenderable, IUpdatable
     {
 
         #region Private Properties
@@ -27,6 +27,8 @@ namespace Lor9nEngine.Rendering.Base
         /// Список загруженных текстур
         /// </summary>
         private static readonly List<ITexture> _loadedTextures = new();
+
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         #endregion
 
@@ -82,9 +84,9 @@ namespace Lor9nEngine.Rendering.Base
         /// Конструктор модели по пути
         /// </summary>
         /// <param name="path">Путь, где находится модель</param>
-        internal Model(string path)
+        public Model(string path)
         {
-            directory = path.Substring(0, path.LastIndexOf('/'));
+            directory = path[..path.LastIndexOf('/')];
             _path = path;
             // Если модель не существует в словаре моделей, то загружаем её
             if (!CheckModels(_path))
@@ -104,7 +106,7 @@ namespace Lor9nEngine.Rendering.Base
         /// </summary>
         /// <param name="mesh">Сам меш</param>
         /// <param name="name">Название модели, которое пойдет как путь модели</param>
-        internal Model(Mesh mesh, string name)
+        public Model(Mesh mesh, string name)
         {
             if (!CheckModels(name))
             {
@@ -120,7 +122,7 @@ namespace Lor9nEngine.Rendering.Base
         /// <param name="mesh">Сам меш</param>
         /// <param name="textures">Список текстур</param>
         /// <param name="name">Наименование модели, пойдет как путь модели</param>
-        internal Model(Mesh mesh, List<ITexture> textures, string name)
+        public Model(Mesh mesh, List<ITexture> textures, string name)
             : this(mesh, name)
         {
             if (!CheckModels(name))
@@ -131,7 +133,6 @@ namespace Lor9nEngine.Rendering.Base
                 mesh.Textures = textures;
             }
         }
-        [JsonConstructor]
         public Model(List<Mesh> meshes, string name, string path)
         {
             _path = path;
@@ -146,7 +147,18 @@ namespace Lor9nEngine.Rendering.Base
             }
         }
 
+        public void RenderWithOutTextures(Shader shader)
+        {
+            if (Animator.HasAnimation)
+            {
+                Animator?.Render();
+            }
 
+            for (int i = 0; i < Meshes.Count; i++)
+            {
+                Meshes[i].RenderWithOutTextures(shader);
+            }
+        }
 
         public void Render(Shader shader)
         {
@@ -245,7 +257,7 @@ namespace Lor9nEngine.Rendering.Base
 
             if (textures.Count == 0)
             {
-                textures.AddRange(Texture.GetDefaultTextures);
+                textures.AddRange(Texture2D.GetDefaultTextures);
             }
             if (mesh.HasBones)
             {
@@ -276,7 +288,7 @@ namespace Lor9nEngine.Rendering.Base
                 {
                     if (str.FilePath != null)
                     {
-                        ITexture texture = Texture.LoadFromFile(str.FilePath, typeName, directory);
+                        ITexture texture = Texture2D.LoadFromFile(str.FilePath, typeName, directory);
                         textures.Add(texture);
                         _loadedTextures.Add(texture);
                     }
@@ -288,8 +300,11 @@ namespace Lor9nEngine.Rendering.Base
         }
         private void LoadModel()
         {
+            _logger.Info($"Loading file: {_path}");
             if (_models.TryGetValue(_path, out var m))
             {
+                _logger.Info($"Find in previously loaded files");
+
                 foreach (var item in m.Meshes)
                 {
                     Meshes.Add(new Mesh(item));
@@ -297,6 +312,7 @@ namespace Lor9nEngine.Rendering.Base
             }
             else
             {
+                _logger.Info($"Importing file");
                 using AssimpContext importer = new();
                 if (!importer.IsImportFormatSupported(Path.GetExtension(_path)))
                 {
@@ -320,6 +336,7 @@ namespace Lor9nEngine.Rendering.Base
                 }
                 Animator = new Animator(Animations.FirstOrDefault().Value);
                 logger.Detach();
+                _logger.Info("End importing");
             }
         }
         /// <summary>
@@ -378,6 +395,8 @@ namespace Lor9nEngine.Rendering.Base
                 item.Dispose();
             }
         }
+
+
 
         #endregion
         #endregion

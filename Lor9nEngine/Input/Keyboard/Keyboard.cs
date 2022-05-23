@@ -1,7 +1,8 @@
-﻿using OpenTK.Windowing.Desktop;
+﻿
+using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace Lor9nEngine
+namespace Lor9nEngine.Input.Keyboard
 {
     /// <summary>
     /// Класс отвечающий за клавиатуру

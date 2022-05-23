@@ -3,7 +3,7 @@ using Lor9nEngine.Rendering.Base.Buffers;
 
 namespace Lor9nEngine.Rendering.Interfaces
 {
-    internal interface IObjectSetupper : IRenderable
+    public interface IObjectSetupper : IRenderable
     {
         public VAO Vao { get; init; }
         public VBO Vbo { get; init; }

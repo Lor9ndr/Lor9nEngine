@@ -2,10 +2,10 @@
 
 using OpenTK.Mathematics;
 
-namespace Lor9nEngine.Components
+namespace Lor9nEngine.Components.Transform
 {
 
-    internal interface ITransform : IComponent, IUpdatable
+    public interface ITransform : IComponent, IUpdatable
     {
         public Vector3 Position { get; set; }
         public Vector3 Direction { get; set; }

@@ -5,7 +5,7 @@ using OpenTK.Windowing.Desktop;
 
 namespace Lor9nEngine
 {
-    internal class Application:IDisposable
+    internal class Application : IDisposable
     {
         public event Action Load;
         public event Action Unload;
@@ -23,7 +23,7 @@ namespace Lor9nEngine
             Game.RenderFrame += OnRenderFrame;
             Game.Run();
         }
-      
+
         public virtual void OnLoad()
         {
             Scene? scene = null;

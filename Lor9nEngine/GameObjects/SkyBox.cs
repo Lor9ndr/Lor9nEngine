@@ -1,16 +1,14 @@
-﻿using Lor9nEngine.Components;
+﻿using Lor9nEngine.Components.Transform;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
 using Lor9nEngine.Rendering.Interfaces;
 using Lor9nEngine.Rendering.Textures;
 
-using Newtonsoft.Json;
-
 using OpenTK.Graphics.OpenGL4;
 
 namespace Lor9nEngine.GameObjects
 {
-    internal class SkyBox : IGameObject
+    public class SkyBox : IGameObject
     {
         private readonly Shader _skyBoxShader = new Shader(Game.SKYBOX_SHADER_PATH + ".vs", Game.SKYBOX_SHADER_PATH + ".fr");
 
@@ -74,7 +72,6 @@ namespace Lor9nEngine.GameObjects
         public IGameObject Parent { get; set; }
         public ITransform Transform { get; set; }
 
-        [JsonConstructor]
         public SkyBox()
         {
             _cubemapTexture = CubeMap.LoadCubeMapFromFile(faces, TextureType.Skybox);
@@ -115,7 +112,7 @@ namespace Lor9nEngine.GameObjects
 
         public async Task UpdateAsync()
         {
-
+            await Task.CompletedTask;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -147,6 +144,16 @@ namespace Lor9nEngine.GameObjects
             // Не изменяйте этот код. Разместите код очистки в методе "Dispose(bool disposing)".
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        void IRenderable.RenderWithOutTextures(Shader shader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RenderModel(Shader shader)
+        {
+            throw new NotImplementedException();
         }
     }
 }

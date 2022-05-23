@@ -11,7 +11,7 @@ using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
 
 namespace Lor9nEngine.Rendering.Textures
 {
-    internal class CubeMap : ITexture
+    public class CubeMap : ITexture
     {
         private int _handle;
         public TextureType Type { get; set; } = TextureType.SkyBox;
@@ -25,10 +25,12 @@ namespace Lor9nEngine.Rendering.Textures
         public PBO[] Pbos { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public IntPtr Pointer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public int CurrentPboIndex { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public CubeMap() : base()
+        public TextureUnit SelfUnit => TextureUnit.Texture31;
+        public CubeMap(TextureType type)
         {
-
+            EngineGL.Instance.GenTexture(out _handle);
+            Type = type;
+            Target = TextureTarget.TextureCubeMap;
         }
         public CubeMap(int handle, TextureType type, TextureTarget target = TextureTarget.TextureCubeMap)
         {
@@ -41,17 +43,15 @@ namespace Lor9nEngine.Rendering.Textures
             Bind();
             for (int i = 0; i < 6; i++)
             {
-
                 EngineGL.Instance.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i,
                     0, format, size.X, size.Y, 0, (PixelFormat)format, type, (IntPtr)null);
             }
 
-            EngineGL.Instance.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear)
-            .TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear)
-            .TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge)
-            .TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge)
-            .TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
-            GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
+            EngineGL.Instance.TexParameter(Target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest)
+            .TexParameter(Target, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest)
+            .TexParameter(Target, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge)
+            .TexParameter(Target, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge)
+            .TexParameter(Target, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
         }
 
         public static CubeMap LoadCubeMapFromFile(string[] faces, TextureType type)
@@ -92,7 +92,6 @@ namespace Lor9nEngine.Rendering.Textures
                         .TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge)
                         .TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge)
                         .TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
-            GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
             var cubeMap = new CubeMap(handle, type, TextureTarget.TextureCubeMap) { Size = size };
             return cubeMap;
         }
@@ -101,12 +100,13 @@ namespace Lor9nEngine.Rendering.Textures
 
         public void Bind()
         {
-            throw new NotImplementedException();
+            GL.BindTexture(TextureTarget.TextureCubeMap, Handle);
         }
 
         public void Unbind()
         {
-            throw new NotImplementedException();
+            GL.BindTexture(TextureTarget.TextureCubeMap, 0);
+
         }
 
         /// <summary>

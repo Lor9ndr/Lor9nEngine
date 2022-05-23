@@ -3,7 +3,7 @@ using Lor9nEngine.Rendering.Interfaces;
 
 namespace Lor9nEngine.Components.Light
 {
-    internal class LightConstants : IComponent
+    public class LightConstants : IComponent
     {
         public float Constant { get; set; }
         public float Linear { get; set; }
@@ -29,6 +29,11 @@ namespace Lor9nEngine.Components.Light
         }
 
         public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IRenderable.RenderWithOutTextures(Shader shader)
         {
             throw new NotImplementedException();
         }

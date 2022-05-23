@@ -186,7 +186,7 @@ namespace Lor9nEngine
             get => _bindedVao;
             set
             {
-                if (_bindedVao != value)
+                if (_bindedVao != value && value is not null)
                 {
                     _bindedVao = value;
                     BindVAO(value);
@@ -240,7 +240,7 @@ namespace Lor9nEngine
         /// <summary>
         /// Текущий буффер кадра
         /// </summary>
-        internal FrameBuffer CurrentFrameBuffer { get; private set; }
+        private FrameBuffer CurrentFrameBuffer { get; set; }
         #endregion
 
         /// <summary>
@@ -337,11 +337,8 @@ namespace Lor9nEngine
         /// <param name="vao">класс с индексом объекта массива вершин</param>
         internal EngineGL BindVAO(IGLObject vao)
         {
-            if (BindedVao != vao)
-            {
-                GL.BindVertexArray(vao.Handle);
-                BindedVao = vao;
-            }
+            GL.BindVertexArray(vao.Handle);
+            BindedVao = vao;
             return this;
         }
         internal EngineGL DeleteVAO(IGLObject vao)
@@ -421,7 +418,7 @@ namespace Lor9nEngine
         /// <param name="name">название uniform в шейдере</param>
         /// <param name="data">собственно сами данные,которые будут отправляться в шейдер</param>
         internal EngineGL SetShaderData<T>(string name, T data)
-            where T : struct
+            where T : notnull
         {
             if (data is Vector3 data3)
             {
@@ -551,11 +548,10 @@ namespace Lor9nEngine
         /// <returns></returns>
         internal EngineGL ActiveTexture(TextureUnit unit)
         {
-            if (unit != ActiveTextureUnit)
-            {
-                GL.ActiveTexture(unit);
-                ActiveTextureUnit = unit;
-            }
+            //Console.WriteLine($"ACTIVATING TEXTURE_UNIT : {unit}");
+
+            GL.ActiveTexture(unit);
+            ActiveTextureUnit = unit;
             return this;
         }
 
@@ -566,12 +562,11 @@ namespace Lor9nEngine
         /// <param name="textureID">индекс текстуры</param>
         internal EngineGL BindTexture(TextureTarget target, int textureID)
         {
-            if (textureID != BindedTexID)
-            {
-                GL.BindTexture(target, textureID);
-                BindedTexID = textureID;
-                BindedTexture = null;
-            }
+
+            //Console.WriteLine($"TARGET: { target}, TEXTURE_ID: { textureID}");
+            GL.BindTexture(target, textureID);
+            BindedTexID = textureID;
+            BindedTexture = null;
             return this;
         }
 
@@ -582,12 +577,11 @@ namespace Lor9nEngine
         /// <param name="texture">Отправляемая текстура</param>
         internal EngineGL BindTexture(TextureTarget target, ITexture texture)
         {
-            if (texture != BindedTexture && texture.Handle != BindedTexID)
-            {
-                GL.BindTexture(target, texture.Handle);
-                BindedTexID = texture.Handle;
-                BindedTexture = texture;
-            }
+
+            //Console.WriteLine($"TARGET: { target}, TEXTURE_ID: { texture.Handle}");
+            GL.BindTexture(target, texture.Handle);
+            BindedTexID = texture.Handle;
+            BindedTexture = texture;
             return this;
         }
 
@@ -646,11 +640,8 @@ namespace Lor9nEngine
         /// <returns></returns>
         internal EngineGL BindFramebuffer(FramebufferTarget target, FrameBuffer frameBuffer)
         {
-            if (frameBuffer != CurrentFrameBuffer)
-            {
-                GL.BindFramebuffer(target, frameBuffer.Handle);
-                CurrentFrameBuffer = frameBuffer;
-            }
+            GL.BindFramebuffer(target, frameBuffer.Handle);
+            CurrentFrameBuffer = frameBuffer;
             return this;
         }
 

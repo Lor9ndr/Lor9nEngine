@@ -1,12 +1,17 @@
-﻿using ImGuiNET;
+﻿using System.ComponentModel;
+using System.Reflection;
 
-using Lor9nEngine.Components;
+using ImGuiNET;
+
 using Lor9nEngine.Components.Light;
+using Lor9nEngine.Components.Transform;
 using Lor9nEngine.GameObjects;
 using Lor9nEngine.GameObjects.Lights;
+using Lor9nEngine.Input.Keyboard;
 using Lor9nEngine.Rendering;
-using Lor9nEngine.Rendering.FrameBuffer;
 using Lor9nEngine.Scenes;
+
+using NLog;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.ImGui;
@@ -17,8 +22,10 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Lor9nEngine
 {
-    internal class Game : GameWindow
+    public class Game : GameWindow
     {
+        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Ширина окна
         /// </summary>
@@ -46,7 +53,6 @@ namespace Lor9nEngine
 
         public Shader MainShader;
         public Shader LightBoxShader;
-        public FrameBuffer DefaultFBO = new FrameBuffer(new Vector2i(Width, Height), ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         public CancellationTokenSource CancellationTokenSource { get; private set; }
         public static CancellationToken CancellationToken { get; private set; }
@@ -59,6 +65,7 @@ namespace Lor9nEngine
         public static Thread? UploadThread;
 
         #region Constants
+        private static string ASSEMBLY_PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!.ToString();
         public const string RESOURCE_PATH = "../../../Resources/";
         public const string TEXTURES_PATH = RESOURCE_PATH + "Textures/";
         public const string OBJ_PATH = RESOURCE_PATH + "Objects/";
@@ -74,9 +81,7 @@ namespace Lor9nEngine
         public const string DEFERRED_RENDER_PATH = SHADERS_PATH + "DeferredShading/";
         public const string ANOTHER_SHADERS_PATH = DEFERRED_RENDER_PATH + "Another/";
         public const string SKYBOX_SHADER_PATH = SHADERS_PATH + "SkyBox/SkyBox";
-        public const string SHADOW_SHADERS_PATH = SHADERS_PATH + "ShadowShaders/";
-        public const string DIRECT_SHADOW_SHADERS_PATH = SHADOW_SHADERS_PATH + "DirectShadows/";
-        public const string POINT_SHADOW_SHADERS_PATH = SHADOW_SHADERS_PATH + "PointShadows/";
+        public const string SHADOW_SHADERS_PATH = SHADERS_PATH + "Shadow/";
         #endregion
 
         private double oldTimeSinceStart;
@@ -95,42 +100,48 @@ namespace Lor9nEngine
         private string _sceneName = "default";
         private Scene _currentScene;
         private int _currentTexture;
-        private readonly object _locker = new object();
         private IGLFWGraphicsContext context { get; set; }
 
         public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
-            : base(gameWindowSettings, nativeWindowSettings)
+            : base(gameWindowSettings, new NativeWindowSettings() { APIVersion = new Version(4, 6), Profile = ContextProfile.Core })
         {
         }
         protected override void OnLoad()
         {
+
             Gui = new ImGuiController(this);
             Keyboard = new Keyboard(this);
             EngineGL.Instance.DebugMessageCallback(Logger.DebugProcCallback, IntPtr.Zero)
-            .Enable(EnableCap.DebugOutput)
-            .Enable(EnableCap.DebugOutputSynchronous);
+                    .Enable(EnableCap.DebugOutput)
+                    .Enable(EnableCap.DebugOutputSynchronous)
+                    .Enable(EnableCap.FramebufferSrgb);
             context = this.Context;
             HandleKeyboard();
-            CursorGrabbed = true;
+            CursorState = CursorState.Grabbed;
             this.Size = new Vector2i(Width, Height);
             VSync = VSyncMode.Off;
             CancellationTokenSource = new CancellationTokenSource();
             CancellationToken = CancellationTokenSource.Token;
 
-            EngineGL.Instance.Enable(EnableCap.FramebufferSrgb);
             UpdateAsync = new Thread(async () =>
             {
+                _logger.Info("Starting async processes");
                 while (!CancellationToken.IsCancellationRequested)
                 {
+                    List<Task> tasks = new List<Task>();
+
                     for (int i = 0; i < GameObjects.Count; i++)
                     {
-                        await GameObjects[i].UpdateAsync();
+                        tasks.Add(GameObjects[i].UpdateAsync());
                     }
+                    await Task.WhenAll(tasks);
+                    tasks.Clear();
                     Thread.Sleep(1);
                 }
+                _logger.Info("End async Process");
+
 
             });
-            UpdateAsync.Start();
 
             MainShader = new Shader(DEFAULT_SHADER + ".vert", DEFAULT_SHADER + ".frag");
             LightBoxShader = new Shader(SHADERS_PATH + "LightBoxShader/LightBox.vert", SHADERS_PATH + "LightBoxShader/LightBox.frag");
@@ -142,35 +153,36 @@ namespace Lor9nEngine
         {
             if (scene == null)
             {
+                _logger.Info("Loading default objects");
                 GameObjects.Clear();
                 Camera = new Camera(new Vector3(10), Size.X / (float)Size.Y);
                 Camera.Enable(this);
                 GameObjects.Add(Camera);
-                GameObjects.Add(new DirectLight(new LightData(new Vector3(0.25f), new Vector3(0.5f), new Vector3(0.5f), new Vector3(1)), new Vector3(1), ModelFactory.GetLightModel()));
-                var tr = new Transform(new Vector3(-10, -10, 10), new Vector3(0), new Vector3(0.5f));
+                GameObjects.Add(new SkyBox());
+
+                var tr = new Transform(new Vector3(-10, -10, 10), new Vector3(0), new Vector3(0.2f));
                 GameObjects.Add(new GameObject(ModelFactory.GetTerrainModel(), tr));
                 GameObjects.Add(new GameObject(ModelFactory.GetDancingVampire(), new Transform(new Vector3(0), new Vector3(0), new Vector3(10))));
-                GameObjects.Add(new SkyBox());
+                GameObjects.Add(new DirectLight(new LightData(new Vector3(0.25f), new Vector3(0.5f), new Vector3(0.5f), new Vector3(1)), new Vector3(1), ModelFactory.GetLightModel())); GameObjects.Add(new SpotLight(new LightConstants(), new LightData(new Vector3(0.25f), new Vector3(1.0f), new Vector3(0.3f), new Vector3(1)), ModelFactory.GetLightModel()));
+                GameObjects.Add(new SpotLight(new LightConstants(), new LightData(new Vector3(0.25f), new Vector3(1.0f), new Vector3(0.3f), new Vector3(1)), ModelFactory.GetLightModel()));
+                GameObjects.Add(new SpotLight(new LightConstants(), new LightData(new Vector3(0.25f), new Vector3(1.0f), new Vector3(0.3f), new Vector3(1)), ModelFactory.GetLightModel()));
+                GameObjects.Add(new SpotLight(new LightConstants(), new LightData(new Vector3(0.25f), new Vector3(1.0f), new Vector3(0.3f), new Vector3(1)), ModelFactory.GetLightModel()));
                 GameObjects.Add(new PointLight(new LightConstants(), new LightData(new Vector3(0.25f), new Vector3(1.0f), new Vector3(0.3f), new Vector3(1)), ModelFactory.GetLightModel()));
                 _currentScene = new Scene("Default", GameObjects);
+                _logger.Info("Loading models ended");
             }
             else
             {
                 GameObjects = scene.GameObjects;
                 _currentScene = scene;
             }
+            UpdateAsync.Start();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            DefaultFBO.Activate();
-            EngineGL.Instance.ClearColor(0.2f, 0.1f, 0.2f, 1.0f)
-                .Enable(EnableCap.DepthTest)
-                .Enable(EnableCap.DepthClamp)
-                .Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            int nrPointLights = GameObjects.OfType<PointLight>().Count();
-            MainShader.Use();
-            MainShader.SetInt("nrPointLights", nrPointLights);
+
+
             _currentScene.RenderAll(MainShader);
 
             // DEBUG RENDER LIGHT GAMEOBJECT SHADER
@@ -189,7 +201,7 @@ namespace Lor9nEngine
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
             CalculateFPS();
-            Title = $"FPS: {FPS}";
+            Title = "FPS: " + FPS;
             base.OnUpdateFrame(args);
             Gui.Update(this, DeltaTime);
 
@@ -197,7 +209,11 @@ namespace Lor9nEngine
             {
                 item.Update();
             }
-
+            int nrPointLights = GameObjects.OfType<PointLight>().Count();
+            int nrSpotLights = GameObjects.OfType<SpotLight>().Count();
+            MainShader.Use();
+            MainShader.SetInt("nrPointLights", nrPointLights);
+            MainShader.SetInt("nrSpotLights", nrSpotLights);
             EngineGL.Instance.UseShader(MainShader).SetShaderData("enableLight", EnableLight);
 
             _time += args.Time;
@@ -210,8 +226,10 @@ namespace Lor9nEngine
             Width = Size.X;
             Height = Size.Y;
             EngineGL.Instance.Viewport(0, 0, Width, Height);
-            DefaultFBO.Size = e.Size;
-            DefaultFBO.SetViewPort();
+            if (_currentScene is not null)
+            {
+                _currentScene.DefaultFBO.Size = e.Size;
+            }
             // Tell ImGui of the new size
             Gui.WindowResized(Width, Height);
             base.OnResize(e);
@@ -222,14 +240,15 @@ namespace Lor9nEngine
             base.OnUnload();
 
         }
-        protected override void OnClosed()
+        protected override void OnClosing(CancelEventArgs e)
         {
-            base.OnClosed();
+            base.OnClosing(e);
             foreach (var item in GameObjects)
             {
                 item.Dispose();
             }
         }
+
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
             base.OnMouseWheel(e);
@@ -252,25 +271,47 @@ namespace Lor9nEngine
         }
         private void HandleKeyboard()
         {
-            Keyboard.BindKey(Keys.Escape, Close, PressType.Down);
+            Keyboard!.BindKey(Keys.Escape, Close, PressType.Down);
             Keyboard.BindKey(Keys.M, new Action(() => { EngineGL.Instance.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Point); }), PressType.Down);
             Keyboard.BindKey(Keys.Comma, new Action(() => { EngineGL.Instance.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line); }), PressType.Down);
             Keyboard.BindKey(Keys.Period, new Action(() => { EngineGL.Instance.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill); }), PressType.Down);
+            Keyboard.BindKey(Keys.X, ToggleFullscreen, PressType.Down);
             Keyboard.BindKey(Keys.LeftControl, new Action(() =>
             {
-                CursorGrabbed = false;
-                CursorVisible = true;
-                _isGuiVisible = !CursorGrabbed;
-                Camera.CanMove = CursorGrabbed;
+                CursorState = CursorState.Normal;
+                _isGuiVisible = true;
+                Camera.CanMove = false;
+            }), PressType.Down);
+            Keyboard.BindKey(Keys.O, new Action(() =>
+            {
+                var light = GameObjects.OfType<SpotLight>().FirstOrDefault();
+                light.Transform.Position = Camera.Transform.Position;
+                light.Transform.Direction = Camera.Transform.Direction;
             }), PressType.Down);
 
             Keyboard.BindKey(Keys.LeftAlt, new Action(() =>
             {
-                CursorGrabbed = true;
-                Camera.CanMove = CursorGrabbed;
-                _isGuiVisible = !CursorGrabbed;
+                CursorState = CursorState.Grabbed;
+                Camera.CanMove = true;
+                _isGuiVisible = false;
 
             }), PressType.Down);
+        }
+
+        private void ToggleFullscreen()
+        {
+            if (IsFullscreen)
+            {
+                WindowBorder = WindowBorder.Fixed;
+                WindowState = WindowState.Normal;
+            }
+            else
+            {
+                WindowBorder = WindowBorder.Hidden;
+                WindowState = WindowState.Fullscreen;
+            }
+            Thread.Sleep(360);
+            Camera.AspectRatio = Size.X / (float)Size.Y;
         }
         void onDrawGUI()
         {
@@ -395,22 +436,31 @@ namespace Lor9nEngine
                         float intensity = light.LightData.Intensity;
                         ImGui.DragFloat("Intensity", ref intensity, 0.1f);
                         light.LightData.Intensity = intensity;
-                        if (obj is PointLight)
+                        if (obj is IConstantableLight constantableLight)
                         {
                             ImGui.Text("Light constants");
-                            var pl = light as PointLight;
-                            float constant = pl.LightConstants.Constant;
+                            float constant = constantableLight.LightConstants.Constant;
                             ImGui.DragFloat("Constant", ref constant, 0.1f);
-                            pl.LightConstants.Constant = constant;
+                            constantableLight.LightConstants.Constant = constant;
 
-                            float linear = pl.LightConstants.Linear;
+                            float linear = constantableLight.LightConstants.Linear;
                             ImGui.DragFloat("Linear", ref linear, 0.1f);
-                            pl.LightConstants.Linear = linear;
+                            constantableLight.LightConstants.Linear = linear;
 
-                            float quadratic = pl.LightConstants.Quadratic;
+                            float quadratic = constantableLight.LightConstants.Quadratic;
                             ImGui.DragFloat("Quadratic", ref quadratic, 0.1f);
-                            pl.LightConstants.Quadratic = quadratic;
+                            constantableLight.LightConstants.Quadratic = quadratic;
                         }
+
+                        float far = light.Shadow.Far;
+                        ImGui.DragFloat("Far", ref far, 0.1f);
+                        light.Shadow.Far = far;
+
+
+                        float near = light.Shadow.Near;
+                        ImGui.DragFloat("Near", ref near, 0.1f);
+                        light.Shadow.Near = near;
+
 
                     }
                     ImGui.ListBox("Meshes", ref _selectedMesh, obj.Model.Meshes.Select(s => s.Name).ToArray(), obj.Model.Meshes.Count, 30);
@@ -433,6 +483,20 @@ namespace Lor9nEngine
                     ImGui.Image((IntPtr)currentMesh.Textures[_currentTexture].Handle, new System.Numerics.Vector2(200));
                 }
             }
+            ImGui.SetNextWindowPos(new System.Numerics.Vector2(Size.X / 2 - 360, 20));
+            ImGui.SetNextWindowSize(new System.Numerics.Vector2(300, 900), ImGuiCond.Always);
+            if (ImGui.Begin("Add Lights"))
+            {
+                if (ImGui.Button("Add spotLight"))
+                {
+                    GameObjects.Add(new SpotLight(new LightConstants(), new LightData(new Vector3(0.25f), new Vector3(1.0f), new Vector3(0.3f), new Vector3(1)), ModelFactory.GetLightModel()));
+                }
+                if (ImGui.Button("Add Point Light"))
+                {
+                    GameObjects.Add(new PointLight(new LightConstants(), new LightData(new Vector3(0.25f), new Vector3(1.0f), new Vector3(0.3f), new Vector3(1)), ModelFactory.GetLightModel()));
+                }
+            }
+            
             ImGui.End();
         }
     }

@@ -8,7 +8,7 @@ using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Rendering.Animate
 {
-    internal class Animator : IRenderable, IUpdatable
+    public class Animator : IRenderable, IUpdatable
     {
         private readonly List<Matrix4> _finalBoneMatrices;
         private Animation? _currentAnimation;
@@ -97,6 +97,11 @@ namespace Lor9nEngine.Rendering.Animate
 
         public void Dispose()
         {
+        }
+
+        void IRenderable.RenderWithOutTextures(Shader shader)
+        {
+            throw new NotImplementedException();
         }
     }
 }

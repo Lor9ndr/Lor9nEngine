@@ -6,7 +6,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace Lor9nEngine.Rendering.Base
 {
-    internal class Mesh : BaseGLObject
+    public class Mesh : BaseGLObject
     {
         private static int id;
         private int _currentId;
@@ -53,13 +53,13 @@ namespace Lor9nEngine.Rendering.Base
 
         public override void Render(Shader shader)
         {
+            //Console.WriteLine($"Rendering MESH : {_name}");
             ObjectSetupper.Vao.Bind();
             for (int i = 0; i < Textures?.Count; i++)
             {
                 var tex = Textures[i];
+
                 string name = tex.Type.ToString();
-
-
                 tex.Use(TextureUnit.Texture0 + i);
 
                 //ProcessWithPBO(tex);
@@ -70,11 +70,22 @@ namespace Lor9nEngine.Rendering.Base
                     .SetShaderData(name, i);
             }
             base.Render(shader);
-            EngineGL.Instance.BindTexture(TextureTarget.Texture2D, 0);
+            for (int i = 0; i < Textures?.Count; i++)
+            {
+                EngineGL.Instance.BindTexture(Textures[i].Target, 0);
+            }
+        }
+
+        public override void RenderWithOutTextures(Shader shader)
+        {
+            ObjectSetupper.Vao.Bind();
+            base.Render(shader);
+            ObjectSetupper.Vao.Unbind();
+
         }
 
         /// <summary>
-        /// STILL NOT OPTIMIZED
+        /// NOT OPTIMIZED
         /// </summary>
         /// <param name="tex"></param>
         [Obsolete]

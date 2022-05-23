@@ -1,4 +1,6 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using NLog;
+
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace Lor9nEngine.Rendering
@@ -21,6 +23,7 @@ namespace Lor9nEngine.Rendering
         private static int _ActiveHandle;
         private bool disposedValue = false;
         public string Path => _path;
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Конструктор для получения шейдера с геометрическим шейдером
@@ -30,6 +33,7 @@ namespace Lor9nEngine.Rendering
         /// <param name="geomPath">Путь к геометрическому шейдеру</param>
         public Shader(string vertPath, string fragPath, string geomPath)
         {
+
             _path = vertPath;
             // Load vertex shader and compile
             var shaderSource = File.ReadAllText(vertPath);
@@ -300,7 +304,11 @@ namespace Lor9nEngine.Rendering
 
                 if (pos == -1)
                 {
-                    Console.WriteLine($"{name} Was not setted in {_path.Split('/').Where(s => s.Contains('.')).ToList().Last()}");
+                    var path = _path.Split('/').Where(s => s.Contains('.')).ToList().Last();
+
+                    var error = $"{name} Was not setted in {path}";
+                    Console.WriteLine(error);
+                    _logger.Warn(error);
                 }
                 return pos;
             }

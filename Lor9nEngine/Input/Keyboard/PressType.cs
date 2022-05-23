@@ -1,4 +1,4 @@
-﻿namespace Lor9nEngine
+﻿namespace Lor9nEngine.Input.Keyboard
 {
     public enum PressType
     {

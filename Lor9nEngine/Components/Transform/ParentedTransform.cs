@@ -1,11 +1,12 @@
 ﻿using Lor9nEngine.GameObjects;
 using Lor9nEngine.Rendering;
+using Lor9nEngine.Rendering.Interfaces;
 
 using Newtonsoft.Json;
 
 using OpenTK.Mathematics;
 
-namespace Lor9nEngine.Components
+namespace Lor9nEngine.Components.Transform
 {
     internal class ParentedTransform : IParentedTransform
     {
@@ -80,6 +81,11 @@ namespace Lor9nEngine.Components
         }
 
         public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IRenderable.RenderWithOutTextures(Shader shader)
         {
             throw new NotImplementedException();
         }

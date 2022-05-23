@@ -2,7 +2,7 @@
 
 namespace Lor9nEngine.Rendering.Base
 {
-    internal class BaseGLObject : IRenderable
+    public class BaseGLObject : IRenderable
     {
         public IObjectSetupper ObjectSetupper;
 
@@ -24,6 +24,10 @@ namespace Lor9nEngine.Rendering.Base
         {
             EngineGL.Instance.UseShader(shader);
             ObjectSetupper.Render(shader);
+        }
+        public virtual void RenderWithOutTextures(Shader shader)
+        {
+            throw new NotImplementedException();
         }
 
         public virtual void Dispose()

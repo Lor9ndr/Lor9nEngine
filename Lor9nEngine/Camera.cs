@@ -1,7 +1,9 @@
-﻿using Lor9nEngine.Components;
+﻿using Lor9nEngine.Components.Transform;
 using Lor9nEngine.GameObjects;
+using Lor9nEngine.Input.Keyboard;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
+using Lor9nEngine.Rendering.Interfaces;
 
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -9,8 +11,9 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Lor9nEngine
 {
-    internal class Camera : IGameObject
+    public class Camera : IGameObject
     {
+        public const int MAX_FOV = 120;
         public float CameraSpeed
         {
             get => _cameraSpeed;
@@ -129,7 +132,7 @@ namespace Lor9nEngine
             get => MathHelper.RadiansToDegrees(_fov);
             set
             {
-                var angle = MathHelper.Clamp(value, 45f, 120f);
+                var angle = MathHelper.Clamp(value, 45f, MAX_FOV);
                 _fov = MathHelper.DegreesToRadians(angle);
             }
         }
@@ -220,6 +223,17 @@ namespace Lor9nEngine
             // Не изменяйте этот код. Разместите код очистки в методе "Dispose(bool disposing)".
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        void IRenderable.RenderWithOutTextures(Shader shader)
+        {
+            Render(shader);
+        }
+
+        public void RenderModel(Shader shader)
+        {
+            Transform.Render(shader);
+            Model?.Render(shader);
         }
     }
 }

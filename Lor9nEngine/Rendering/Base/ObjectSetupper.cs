@@ -67,7 +67,6 @@ namespace Lor9nEngine.Rendering.Base
 
         public void Render()
         {
-
             Vao.Bind();
             EngineGL.Instance.DrawArrays(PrimitiveType.Triangles, 0, VerticesCount);
             Vao.Unbind();
@@ -106,6 +105,11 @@ namespace Lor9nEngine.Rendering.Base
             // Не изменяйте этот код. Разместите код очистки в методе "Dispose(bool disposing)".
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        void IRenderable.RenderWithOutTextures(Shader shader)
+        {
+            throw new NotImplementedException();
         }
     }
 }

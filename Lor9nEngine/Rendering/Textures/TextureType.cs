@@ -8,6 +8,7 @@
         Roughness,
         Alpha,
         SkyBox,
-        Skybox
+        Skybox,
+        Shadow
     }
 }
