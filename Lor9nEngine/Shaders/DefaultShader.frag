@@ -145,14 +145,14 @@ void main()
     float gamma = 1.3;
 
     vec3 result = vec3(0);
-    //result += CalcDirLight(directLight, tanNormal, tanviewDir, diffuseMap, specularMap,F0, roughness, metallic);
+    result += CalcDirLight(directLight, tanNormal, tanviewDir, diffuseMap, specularMap,F0, roughness, metallic);
      // phase 2: point lights
     for(int i = 0; i < nrPointLights; i++)
         result += CalcPointLight(pointLights[i],  defaultNormal, defaultViewDir, diffuseMap, specularMap, F0, roughness, metallic); 
    
     // phase 3: spot light
-     //for(int i = 0; i < nrSpotLights; i++)
-     //     result += CalcSpotLight(spotLights[i], tanNormal, tanviewDir, diffuseMap, specularMap, F0, roughness, metallic);
+    for(int i = 0; i < nrSpotLights; i++)
+         result += CalcSpotLight(spotLights[i], tanNormal, tanviewDir, diffuseMap, specularMap, F0, roughness, metallic);
     FragColor = vec4(result,1.0);
 }
 

@@ -163,17 +163,12 @@ namespace Lor9nEngine
                 var tr = new Transform(new Vector3(-10, -10, 10), new Vector3(0), new Vector3(0.2f));
                 GameObjects.Add(new GameObject(ModelFactory.GetTerrainModel(), tr));
                 GameObjects.Add(new GameObject(ModelFactory.GetDancingVampire(), new Transform(new Vector3(0), new Vector3(0), new Vector3(10))));
-/*              GameObjects.Add(new DirectLight(new LightData(new Vector3(0.25f), new Vector3(0.5f), new Vector3(0.5f), new Vector3(1)), new Vector3(1), ModelFactory.GetLightModel()));
+                GameObjects.Add(new DirectLight(new LightData(new Vector3(0.25f), new Vector3(0.5f), new Vector3(0.5f), new Vector3(1)), new Vector3(1), ModelFactory.GetLightModel()));
                 GameObjects.Add(new SpotLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
                 GameObjects.Add(new SpotLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
                 GameObjects.Add(new SpotLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-                GameObjects.Add(new SpotLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));*/
-                GameObjects.Add(new PointLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-                GameObjects.Add(new PointLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-                GameObjects.Add(new PointLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-                GameObjects.Add(new PointLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-                GameObjects.Add(new PointLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-                GameObjects.Add(new PointLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
+                GameObjects.Add(new SpotLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
+               
                 GameObjects.Add(new PointLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
                 _currentScene = new Scene("Default", GameObjects);
                 _logger.Info("Loading models ended");
