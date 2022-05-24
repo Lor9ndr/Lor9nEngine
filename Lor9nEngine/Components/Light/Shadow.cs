@@ -26,7 +26,7 @@ namespace Lor9nEngine.Components.Light
         private float _near = 2.0f;
 
         public FrameBuffer FBO { get; set; }
-        public Vector2i Size { get; set; } = new Vector2i(4096, 4096);
+        public Vector2i Size { get; set; } = new Vector2i(1024, 1024);
 
         public float Far
         {

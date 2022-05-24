@@ -23,6 +23,9 @@ namespace Lor9nEngine.Components.Light
             FBO.Activate();
             EngineGL.Instance.UseShader(DepthDirectShader)
                 .SetShaderData(nameof(LightSpaceMatrix), LightSpaceMatrix);
+            EngineGL.Instance.SetShaderData("lightPos", _attachedLight.Transform.Position)
+             .SetShaderData("far_plane", Far)
+             .SetShaderData("model", _attachedLight.Transform.Model);
             foreach (var item in gameObjects)
             {
                 item.RenderWithOutTextures(DepthDirectShader);

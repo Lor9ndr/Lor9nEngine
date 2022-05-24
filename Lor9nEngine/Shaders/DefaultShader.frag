@@ -145,14 +145,14 @@ void main()
     float gamma = 1.3;
 
     vec3 result = vec3(0);
-    result += CalcDirLight(directLight, tanNormal, tanviewDir, diffuseMap, specularMap,F0, roughness, metallic);
+    //result += CalcDirLight(directLight, tanNormal, tanviewDir, diffuseMap, specularMap,F0, roughness, metallic);
      // phase 2: point lights
     for(int i = 0; i < nrPointLights; i++)
-        result += CalcPointLight(pointLights[i],  tanNormal, tanviewDir, diffuseMap, specularMap, F0, roughness, metallic); 
+        result += CalcPointLight(pointLights[i],  defaultNormal, defaultViewDir, diffuseMap, specularMap, F0, roughness, metallic); 
    
     // phase 3: spot light
-     for(int i = 0; i < nrSpotLights; i++)
-          result += CalcSpotLight(spotLights[i], tanNormal, tanviewDir, diffuseMap, specularMap, F0, roughness, metallic);
+     //for(int i = 0; i < nrSpotLights; i++)
+     //     result += CalcSpotLight(spotLights[i], tanNormal, tanviewDir, diffuseMap, specularMap, F0, roughness, metallic);
     FragColor = vec4(result,1.0);
 }
 
@@ -187,8 +187,8 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir, vec3 diffColor,
 {
 	// calculate per-light radiance
     vec3 L = light.position - fs_in.TangentFragPos;
-    L *= fs_in.TBN;
     float distance  = length(-L);
+    L *= fs_in.TBN;
     L = normalize(L);
     float NdotL = max(dot(normal, L), 0.0);
     float attenuation = 0;
@@ -196,8 +196,10 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir, vec3 diffColor,
     {
          attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic*(distance * distance));
     }
+
+	
     vec3 H = normalize(viewDir + L);
-    vec3 radiance     = light.color * attenuation * light.intensity;
+    vec3 radiance     = light.color * attenuation * light.intensity * 100;
     
     // cook-torrance brdf
     float NDF = DistributionGGX(normal, H, roughness);
@@ -211,9 +213,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir, vec3 diffColor,
     vec3 numerator    = NDF * G * F;
     float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, L), 0.0) + 0.0001;
     vec3 specular     = numerator / denominator;  
-
     float shadow = ShadowPointCalculation(light,  normal, L);
-
     return ((1.0 - shadow) * (kD * diffColor / PI + specular)) * radiance * NdotL; 
 } 
 // calculates the color when using a spot light.
@@ -371,7 +371,7 @@ float ShadowDirectCalculation(DirectLight light, vec3 lightDir)
 
 
 
-float ShadowPointCalculation(PointLight light,vec3 normal, vec3 lightDir)
+float ShadowPointCalculation(PointLight light, vec3 normal, vec3 lightDir)
 {
 	// get vector from the light to the fragment
 	vec3 lightToFrag = fs_in.FragPos - light.position;

@@ -19,12 +19,20 @@ namespace Lor9nEngine.Components.Light
         public string specularProperty;
         public string colorProperty;
         public string intensityProperty;
+
         public LightData(Vector3 ambient, Vector3 diffuse, Vector3 specular, Vector3 color)
         {
             Ambient = ambient;
             Diffuse = diffuse;
             Specular = specular;
             Color = color;
+        }
+        public LightData()
+        {
+            Ambient = new Vector3(0.25f);
+            Diffuse = new Vector3(1.0f);
+            Specular = new Vector3(0.3f);
+            Color = new Vector3(1);
         }
 
         public void Setup(string name)

@@ -9,7 +9,7 @@ uniform mat4 finalBonesMatrices[MAX_BONES];
 
 uniform mat4 LightSpaceMatrix;
 uniform mat4 model;
-
+out vec4 FragPos; // FragPos from GS (output per emitvertex)
 void main()
 {
     vec4 totalPosition = vec4(0.0f);
@@ -34,5 +34,7 @@ void main()
     {
         totalPosition = vec4(aPos,1.0f);
     }
+
     gl_Position = LightSpaceMatrix * model * vec4(totalPosition.xyz, 1.0);
+    FragPos = gl_Position;
 }

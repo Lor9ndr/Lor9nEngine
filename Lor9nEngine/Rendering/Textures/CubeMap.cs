@@ -47,8 +47,8 @@ namespace Lor9nEngine.Rendering.Textures
                     0, format, size.X, size.Y, 0, (PixelFormat)format, type, (IntPtr)null);
             }
 
-            EngineGL.Instance.TexParameter(Target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest)
-            .TexParameter(Target, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest)
+            EngineGL.Instance.TexParameter(Target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear)
+            .TexParameter(Target, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear)
             .TexParameter(Target, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge)
             .TexParameter(Target, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge)
             .TexParameter(Target, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
