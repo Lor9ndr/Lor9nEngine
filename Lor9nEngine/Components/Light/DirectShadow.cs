@@ -30,6 +30,7 @@ namespace Lor9nEngine.Components.Light
             {
                 item.RenderWithOutTextures(DepthDirectShader);
             }
+            FBO.Texture.Unbind();
             FBO.Unbind();
         }
         public override void Render(Shader shader)

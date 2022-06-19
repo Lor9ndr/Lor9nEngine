@@ -96,28 +96,22 @@ namespace Lor9nEngine.Rendering.Textures
             try
             {
                 var pointer = IntPtr.Zero;
-                using (Bitmap image = new Bitmap(path))
-                {
-                    BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
-                   ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                using var image = ITexture.GetData(path, out BitmapData data);
 
+                EngineGL.Instance.GenTexture(out _handle);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.SrgbAlpha, image.Width, image.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
 
+                EngineGL.Instance.GenerateMipmap(GenerateMipmapTarget.Texture2D)
+                      .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear)
+                      .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear)
+                      .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat)
+                      .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat)
+                      ;
+                GL.BindTexture(TextureTarget.Texture2D, 0);
 
-                    EngineGL.Instance.GenTexture(out _handle);
-                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.SrgbAlpha, image.Width, image.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-
-                    EngineGL.Instance.GenerateMipmap(GenerateMipmapTarget.Texture2D)
-                          .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear)
-                          .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear)
-                          .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat)
-                          .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat)
-                          ;
-                    GL.BindTexture(TextureTarget.Texture2D, 0);
-
-                    Size = new Vector2i(image.Width, image.Height);
-                    Type = type;
-                    Pointer = data.Scan0;
-                }
+                Size = new Vector2i(image.Width, image.Height);
+                Type = type;
+                Pointer = data.Scan0;
             }
             catch (ArgumentException)
             {
@@ -315,9 +309,22 @@ namespace Lor9nEngine.Rendering.Textures
             GL.DeleteTexture(Handle);
         }
 
-        public override int GetHashCode()
+        public override int GetHashCode() => Handle.GetHashCode();
+
+
+        public void SetTexParameters(Vector2i size, PixelInternalFormat format, PixelFormat anotherFormat, PixelType type)
         {
-            throw new NotImplementedException();
+            Bind(Target);
+            float[] borderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+            EngineGL.Instance.TexImage2D(TextureTarget.Texture2D, 0, format, size.X, size.Y, 0, PixelFormat.DepthComponent, type, (IntPtr)null)
+                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear)
+                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear)
+                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder)
+                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder)
+                        .GenerateMipmap(GenerateMipmapTarget.Texture2D)
+                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBorderColor, borderColor);
+            GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
+            Unbind();
         }
     }
 }

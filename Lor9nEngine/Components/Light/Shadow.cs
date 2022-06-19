@@ -1,5 +1,4 @@
-﻿
-using Lor9nEngine.GameObjects;
+﻿using Lor9nEngine.GameObjects;
 using Lor9nEngine.GameObjects.Lights;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.FrameBuffer;
@@ -13,7 +12,8 @@ namespace Lor9nEngine.Components.Light
     public class Shadow : IComponent, ISettupable, IUpdatable
     {
         private const FramebufferAttachment _attachment = FramebufferAttachment.DepthAttachment;
-        private const PixelInternalFormat _format = PixelInternalFormat.DepthComponent;
+        private const PixelInternalFormat _internalFormat = PixelInternalFormat.DepthComponent;
+        private const PixelFormat _format = PixelFormat.DepthComponent;
         private const PixelType _type = PixelType.Float;
         internal delegate void ProjectionHandler();
         internal event ProjectionHandler ChangeProjection;
@@ -26,7 +26,6 @@ namespace Lor9nEngine.Components.Light
         private float _near = 2.0f;
 
         public FrameBuffer FBO { get; set; }
-        public Vector2i Size { get; set; } = new Vector2i(1024, 1024);
 
         public float Far
         {
@@ -52,7 +51,8 @@ namespace Lor9nEngine.Components.Light
                 }
             }
         }
-        public static FrameBuffer GetDefaultFrameBuffer() => new FrameBuffer(new Vector2i(1024, 1024), ClearBufferMask.DepthBufferBit);
+        public static Vector2i ShadowSize { get; set; } = new Vector2i(1024, 1024);
+        public static FrameBuffer GetDefaultFrameBuffer() => new FrameBuffer(ShadowSize, ClearBufferMask.DepthBufferBit);
 
         public Shadow(FrameBuffer fbo, BaseLight light)
         {
@@ -70,19 +70,20 @@ namespace Lor9nEngine.Components.Light
             FBO.DisableColorBuffer();
             if (_attachedLight is PointLight)
             {
-                FBO.AttachCubeMap(_attachment, _format, _type);
+                FBO.AttachCubeMap(_attachment, _internalFormat, _format, _type);
             }
             else
             {
-                FBO.AttachTexture2DMap(_attachment, _format, _type);
+                FBO.AttachTexture2DMap(_attachment, _internalFormat, _format, _type);
             }
         }
 
         public virtual void Render(Shader shader)
         {
             RefreshTexID();
-            FBO.Texture.Use(TextureUnit.Texture0 + id);
             EngineGL.Instance
+                .ActiveTexture(TextureUnit.Texture0 + id)
+                .BindTexture(FBO.Texture.Target, FBO.Texture)
                 .SetShaderData(ShadowProperty, id);
 
             id--;

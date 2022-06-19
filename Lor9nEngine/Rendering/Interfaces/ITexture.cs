@@ -1,8 +1,13 @@
-﻿using Lor9nEngine.Rendering.Base.Buffers;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+
+using Lor9nEngine.Rendering.Base.Buffers;
 using Lor9nEngine.Rendering.Textures;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+
+using PixelFormat = OpenTK.Graphics.OpenGL4.PixelFormat;
 
 namespace Lor9nEngine.Rendering.Interfaces
 {
@@ -59,30 +64,17 @@ namespace Lor9nEngine.Rendering.Interfaces
         /// <param name="size">Размер</param>
         /// <param name="format">Формат пикселей</param>
         /// <param name="type">тип пикселей</param>
-        public void SetTexParameters(Vector2i size, PixelInternalFormat format, PixelType type)
-            => SetTexParameters(size, format, (PixelFormat)format, type);
-
-        /// <summary>
-        /// Установка параметров текстуры
-        /// </summary>
-        /// <param name="size">Размер</param>
         /// <param name="format">Формат пикселей</param>
-        /// <param name="type">тип пикселей</param>
-        /// <param name="anotherFormat">Формат пикселей</param>
-        public void SetTexParameters(Vector2i size, PixelInternalFormat format, PixelFormat anotherFormat, PixelType type)
-        {
-            Bind(Target);
-            float[] borderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-            EngineGL.Instance.TexImage2D(TextureTarget.Texture2D, 0, format, size.X, size.Y, 0, anotherFormat, type, (IntPtr)null)
-                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear)
-                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear)
-                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder)
-                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder)
-                        .GenerateMipmap(GenerateMipmapTarget.Texture2D)
-                        .TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBorderColor, borderColor);
-            GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
-            Unbind();
+        public void SetTexParameters(Vector2i size, PixelInternalFormat internalFormat, PixelFormat format, PixelType type);
 
+        protected static Image GetData(string path, out BitmapData data)
+        {
+            var image = new Bitmap(path);
+            data = image.LockBits(
+                new Rectangle(0, 0, image.Width, image.Height),
+                ImageLockMode.ReadOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            return image;
         }
     }
 }

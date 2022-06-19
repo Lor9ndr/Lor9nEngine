@@ -1,5 +1,4 @@
-﻿using Lor9nEngine.Components;
-using Lor9nEngine.Components.Transform;
+﻿using Lor9nEngine.Components.Transform;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
 using Lor9nEngine.Rendering.Interfaces;

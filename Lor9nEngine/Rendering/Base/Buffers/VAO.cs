@@ -18,17 +18,7 @@ namespace Lor9nEngine.Rendering.Base.Buffers
             Handle = 0;
         }
         public void Unbind() => EngineGL.Instance.UnbindVAO();
-        public IBufferVerticesObject Setup(Vertex[]? vertices = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IBufferVerticesObject Setup(Vertex[] vertices, int[] indices) => throw new NotImplementedException();
-        public IBufferVerticesObject Setup(int[] indices) => throw new NotImplementedException();
-
-        public void Bind(BufferTarget target) => throw new NotImplementedException();
-
-        public void Unbind(BufferTarget target) => throw new NotImplementedException();
+       
         public static bool operator ==(VAO vao1, VAO vao2)
         {
             return vao1.Equals(vao2.Handle);
@@ -50,5 +40,15 @@ namespace Lor9nEngine.Rendering.Base.Buffers
             EngineGL.Instance.GenVertexArray(out _handle).BindVAO(this);
             return this;
         }
+        #region NotImplemented
+        public IBufferVerticesObject Setup(Vertex[]? vertices = null) => throw new NotImplementedException();
+
+        public IBufferVerticesObject Setup(Vertex[] vertices, int[] indices) => throw new NotImplementedException();
+        public IBufferVerticesObject Setup(int[] indices) => throw new NotImplementedException();
+
+        public void Bind(BufferTarget target) => throw new NotImplementedException();
+
+        public void Unbind(BufferTarget target) => throw new NotImplementedException();
+        #endregion
     }
 }

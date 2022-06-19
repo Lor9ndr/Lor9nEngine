@@ -70,7 +70,6 @@ namespace Lor9nEngine.Rendering.FrameBuffer
         /// </summary>
         public void Bind()
         {
-            //Console.WriteLine($"BINDING FBO {Handle}");
             EngineGL.Instance.BindFramebuffer(FramebufferTarget.Framebuffer, this);
         }
 
@@ -79,7 +78,6 @@ namespace Lor9nEngine.Rendering.FrameBuffer
         /// </summary>
         public void Unbind()
         {
-            //Console.WriteLine($"UNBINDING FBO {Handle}");
 
             EngineGL.Instance.BindFramebuffer(FramebufferTarget.Framebuffer, EmptyFrameBuffer);
         }
@@ -145,10 +143,10 @@ namespace Lor9nEngine.Rendering.FrameBuffer
         /// <param name="attachment">привязка к определенному слою вроде буффера кадра </param>
         /// <param name="format">Формат текстуры</param>
         /// <param name="type">Тип пикслей</param>
-        public void AttachCubeMap(FramebufferAttachment attachment, PixelInternalFormat format, PixelType type)
+        public void AttachCubeMap(FramebufferAttachment attachment, PixelInternalFormat internalFormat, PixelFormat format, PixelType type)
         {
-            _texture = new CubeMap(TextureType.Shadow) { Size = Size };
-            _texture.SetTexParameters(Size, format, type);
+            _texture = new CubeMap(TextureType.Shadow);
+            _texture.SetTexParameters(Size, internalFormat, format, type);
             EngineGL.Instance.FramebufferTexture(FramebufferTarget.Framebuffer, attachment, _texture, 0);
             CheckState();
 
@@ -158,12 +156,12 @@ namespace Lor9nEngine.Rendering.FrameBuffer
         /// Привязка 2D текстуры
         /// </summary>
         /// <param name="attachment">привязка к определенному слою вроде буффера кадра </param>
-        /// <param name="format">Формат текстуры</param>
+        /// <param name="internalFormat">Формат текстуры</param>
         /// <param name="type">Тип пикслей</param>
-        public void AttachTexture2DMap(FramebufferAttachment attachment, PixelInternalFormat format, PixelType type)
+        public void AttachTexture2DMap(FramebufferAttachment attachment, PixelInternalFormat internalFormat, PixelFormat format, PixelType type)
         {
             _texture = new Texture2D(TextureType.Shadow) { Size = Size };
-            _texture.SetTexParameters(Size, format, type);
+            _texture.SetTexParameters(Size, internalFormat, format, type);
             EngineGL.Instance.FramebufferTexture2D(FramebufferTarget.Framebuffer, attachment, TextureTarget.Texture2D, _texture, 0);
             CheckState();
 

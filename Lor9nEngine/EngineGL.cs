@@ -67,7 +67,7 @@ namespace Lor9nEngine
             /// <summary>
             /// Функция сравнения
             /// </summary>
-            public override bool Equals([NotNullWhen(true)] object obj) => GetHashCode() == obj.GetHashCode();
+            public override bool Equals([NotNull] object obj) => GetHashCode() == obj.GetHashCode();
 
             /// <summary>
             /// Функция, возращающая хэшкод
@@ -252,6 +252,7 @@ namespace Lor9nEngine
             vao = GL.GenVertexArray();
             return this;
         }
+
 
         /// <summary>
         /// включить <see cref="EnableCap"/>
@@ -548,7 +549,6 @@ namespace Lor9nEngine
         /// <returns></returns>
         internal EngineGL ActiveTexture(TextureUnit unit)
         {
-            //Console.WriteLine($"ACTIVATING TEXTURE_UNIT : {unit}");
 
             GL.ActiveTexture(unit);
             ActiveTextureUnit = unit;
@@ -562,8 +562,6 @@ namespace Lor9nEngine
         /// <param name="textureID">индекс текстуры</param>
         internal EngineGL BindTexture(TextureTarget target, int textureID)
         {
-
-            //Console.WriteLine($"TARGET: { target}, TEXTURE_ID: { textureID}");
             GL.BindTexture(target, textureID);
             BindedTexID = textureID;
             BindedTexture = null;
@@ -578,7 +576,6 @@ namespace Lor9nEngine
         internal EngineGL BindTexture(TextureTarget target, ITexture texture)
         {
 
-            //Console.WriteLine($"TARGET: { target}, TEXTURE_ID: { texture.Handle}");
             GL.BindTexture(target, texture.Handle);
             BindedTexID = texture.Handle;
             BindedTexture = texture;
@@ -755,7 +752,7 @@ namespace Lor9nEngine
             return this;
         }
 
-        internal EngineGL DeleteBuffer(IBufferVerticesObject bo)
+        internal EngineGL DeleteBuffer(IBufferObject bo)
         {
             GL.DeleteBuffer(bo.Handle);
             return this;

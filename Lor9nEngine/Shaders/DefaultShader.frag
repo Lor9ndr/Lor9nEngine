@@ -159,6 +159,7 @@ void main()
 vec3 CalcDirLight(DirectLight light, vec3 normal, vec3 viewDir, vec3 diffColor, vec3 specColor,vec3 F0, float roughness, float metallic)
 {
 	// diffuse
+	vec3 ambient = light.ambient * diffColor;
 	vec3 L = normalize(fs_in.TBN *(-light.direction));
     vec3 H = normalize(viewDir + L);
   
@@ -185,35 +186,33 @@ vec3 CalcDirLight(DirectLight light, vec3 normal, vec3 viewDir, vec3 diffColor, 
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir, vec3 diffColor, vec3 specColor,vec3 F0, float roughness, float metallic)
 {
-	// calculate per-light radiance
-    vec3 L = light.position - fs_in.TangentFragPos;
-    float distance  = length(-L);
-    L *= fs_in.TBN;
-    L = normalize(L);
-    float NdotL = max(dot(normal, L), 0.0);
-    float attenuation = 0;
-    if (NdotL > 0)
-    {
-         attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic*(distance * distance));
-    }
-
-	
-    vec3 H = normalize(viewDir + L);
-    vec3 radiance     = light.color * attenuation * light.intensity * 100;
-    
-    // cook-torrance brdf
-    float NDF = DistributionGGX(normal, H, roughness);
-    float G   = GeometrySmith(normal, viewDir, L, roughness);
-    vec3 F    = fresnelSchlick(max(dot(H, viewDir), 0.0), F0);
-    
-    vec3 kS = F;
+	// diffuse
+	vec3 L =  normalize(light.position - fs_in.FragPos);
+	vec3 H = normalize(viewDir + L);
+	float diff = max(dot(normal, L), 0.0);
+	vec3 diffuse = light.diffuse * (diff * diffColor);
+	float NDF = DistributionGGX(normal, H, roughness);   
+    float G   = GeometrySmith(normal, viewDir, L, roughness);      
+    vec3 F    = fresnelSchlick(clamp(dot(H, viewDir), 0.0, 1.0), F0);
+	vec3 numerator    = NDF * G * F; 
+    float denominator = 4 * max(dot(normal, viewDir), 0.0) * max(dot(normal, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+    vec3 specular = numerator / denominator;
+	// calculate attenuation
+	float dist = length(light.position - fs_in.FragPos);
+	float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * (dist * dist));
+	specular *= attenuation;
+    vec3 radiance = light.color * attenuation * light.intensity * 100;
+	vec3 kS = F;
+    // for energy conservation, the diffuse and specular light can't
+    // be above 1.0 (unless the surface emits light); to preserve this
+    // relationship the diffuse component (kD) should equal 1.0 - kS.
     vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - metallic;	  
-    
-    vec3 numerator    = NDF * G * F;
-    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, L), 0.0) + 0.0001;
-    vec3 specular     = numerator / denominator;  
+    // multiply kD by the inverse metalness such that only non-metals 
+    // have diffuse lighting, or a linear blend if partly metal (pure metals
+    // have no diffuse light).
+    kD *= 1.0 - metallic;	   
     float shadow = ShadowPointCalculation(light,  normal, L);
+    float NdotL = max(dot(normal, L), 0.0);
     return ((1.0 - shadow) * (kD * diffColor / PI + specular)) * radiance * NdotL; 
 } 
 // calculates the color when using a spot light.

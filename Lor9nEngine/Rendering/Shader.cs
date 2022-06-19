@@ -307,7 +307,7 @@ namespace Lor9nEngine.Rendering
                     var path = _path.Split('/').Where(s => s.Contains('.')).ToList().Last();
 
                     var error = $"{name} Was not setted in {path}";
-                    Console.WriteLine(error);
+                    //Console.WriteLine(error);
                     _logger.Warn(error);
                 }
                 return pos;
@@ -327,6 +327,7 @@ namespace Lor9nEngine.Rendering
         /// </summary>
         ~Shader()
         {
+            Dispose(false);
         }
         /// <summary>
         /// Удаление шейдера из памяти и тд

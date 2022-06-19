@@ -73,15 +73,10 @@ namespace Lor9nEngine.Scenes
                 .DepthMask(true)
                 .Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             RenderAllGoObjects(shader);
-            Shadow.SetTextureIdDefault();
         }
 
         public void RenderDepth(IEnumerable<ILight> lights, IEnumerable<IGameObject> gameObjectCastingShadow)
         {
-            EngineGL.Instance.Clear(ClearBufferMask.DepthBufferBit)
-                    .ColorMask(true, false, false, false)
-                    .Enable(EnableCap.CullFace)
-                    .CullFace(CullFaceMode.Front);
             SetupCamera(Camera, PointShadow.DepthPointShader);
             SetupCamera(Camera, DirectShadow.DepthDirectShader);
 

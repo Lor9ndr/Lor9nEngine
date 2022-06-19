@@ -1,5 +1,4 @@
-﻿
-using Lor9nEngine.Components.Light;
+﻿using Lor9nEngine.Components.Light;
 using Lor9nEngine.Rendering;
 using Lor9nEngine.Rendering.Base;
 
@@ -7,7 +6,6 @@ using OpenTK.Mathematics;
 
 namespace Lor9nEngine.GameObjects.Lights
 {
-
     public class DirectLight : BaseLight
     {
         public string DirectionProperty;
@@ -30,7 +28,7 @@ namespace Lor9nEngine.GameObjects.Lights
         }
 
         public override void RecreateProjection()
-            => Projection = Matrix4.CreateOrthographicOffCenter(-Shadow.Far, Shadow.Far, -Shadow.Far, Shadow.Far, Shadow.Near, Shadow.Far);
+            => Projection = Matrix4.CreateOrthographic(Shadow.Far, Shadow.Far, Shadow.Near, Shadow.Far);
 
         public override void RenderLight(Shader shader)
         {

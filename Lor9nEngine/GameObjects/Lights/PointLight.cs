@@ -31,10 +31,8 @@ namespace Lor9nEngine.GameObjects.Lights
             Shadow.Setup();
             RecreateProjection();
         }
-        public override void RecreateProjection()
-        {
-            Projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(90), 1.0f, Shadow.Near, Shadow.Far);
-        }
+        public override void RecreateProjection() 
+            => Projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(90), 1.0f, Shadow.Near, Shadow.Far);
 
         public override void RenderLight(Shader shader)
         {

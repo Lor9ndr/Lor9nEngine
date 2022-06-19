@@ -164,11 +164,7 @@ namespace Lor9nEngine
                 GameObjects.Add(new GameObject(ModelFactory.GetTerrainModel(), tr));
                 GameObjects.Add(new GameObject(ModelFactory.GetDancingVampire(), new Transform(new Vector3(0), new Vector3(0), new Vector3(10))));
                 GameObjects.Add(new DirectLight(new LightData(new Vector3(0.25f), new Vector3(0.5f), new Vector3(0.5f), new Vector3(1)), new Vector3(1), ModelFactory.GetLightModel()));
-                GameObjects.Add(new SpotLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-                GameObjects.Add(new SpotLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-                GameObjects.Add(new SpotLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-                GameObjects.Add(new SpotLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
-               
+
                 GameObjects.Add(new PointLight(new LightConstants(), new LightData(), ModelFactory.GetLightModel()));
                 _currentScene = new Scene("Default", GameObjects);
                 _logger.Info("Loading models ended");
@@ -282,19 +278,19 @@ namespace Lor9nEngine
             {
                 CursorState = CursorState.Normal;
                 _isGuiVisible = true;
-                Camera.CanMove = false;
+                Camera!.CanMove = false;
             }), PressType.Down);
             Keyboard.BindKey(Keys.O, new Action(() =>
             {
                 var light = GameObjects.OfType<SpotLight>().FirstOrDefault();
-                light.Transform.Position = Camera.Transform.Position;
-                light.Transform.Direction = Camera.Transform.Direction;
+                light.Transform.Position = Camera!.Transform.Position;
+                light.Transform.Direction = Camera!.Transform.Direction;
             }), PressType.Down);
 
             Keyboard.BindKey(Keys.LeftAlt, new Action(() =>
             {
                 CursorState = CursorState.Grabbed;
-                Camera.CanMove = true;
+                Camera!.CanMove = true;
                 _isGuiVisible = false;
 
             }), PressType.Down);
@@ -498,7 +494,7 @@ namespace Lor9nEngine
                     GameObjects.Add(new PointLight(new LightConstants(), new LightData(new Vector3(0.25f), new Vector3(1.0f), new Vector3(0.3f), new Vector3(1)), ModelFactory.GetLightModel()));
                 }
             }
-            
+
             ImGui.End();
         }
     }

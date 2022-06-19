@@ -18,19 +18,19 @@ namespace Lor9nEngine.Rendering.Base.Buffers
                     .BufferData(BufferTarget.ArrayBuffer, vertices.Length * Vertex.Size, vertices, BufferUsageHint.StaticDraw);
             return this;
         }
-        public IBufferVerticesObject Setup(int[] indices) => throw new NotImplementedException();
-        public IBufferVerticesObject Setup(Vertex[] vertices, int[] indices) => throw new NotImplementedException();
 
         public void Bind(BufferTarget target) => EngineGL.Instance.BindBuffer(target, this);
 
         public void Unbind(BufferTarget target) => EngineGL.Instance.UnbindBuffer(target);
+        
+        #region NotImplemented        
         public void Unbind() => throw new NotImplementedException();
 
         public void Bind() => throw new NotImplementedException();
 
-        public IBufferObject Setup()
-        {
-            throw new NotImplementedException();
-        }
+        public IBufferObject Setup() => throw new NotImplementedException();
+        public IBufferVerticesObject Setup(int[] indices) => throw new NotImplementedException();
+        public IBufferVerticesObject Setup(Vertex[] vertices, int[] indices) => throw new NotImplementedException();
+        #endregion
     }
 }

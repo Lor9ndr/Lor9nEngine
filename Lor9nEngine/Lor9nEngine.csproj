@@ -34,4 +34,10 @@
     <Folder Include="Resources\Objects\PBR\Новая папка\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

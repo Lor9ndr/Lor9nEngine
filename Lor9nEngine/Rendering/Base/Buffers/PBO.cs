@@ -12,17 +12,7 @@ namespace Lor9nEngine.Rendering.Base.Buffers
 
         public int Handle { get => _handle; set => _handle = value; }
 
-        public void Bind(BufferTarget target)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Bind() => EngineGL.Instance.BindBuffer(BufferTarget.PixelPackBuffer, this);
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
 
         public IBufferObject Setup()
         {
@@ -79,12 +69,18 @@ namespace Lor9nEngine.Rendering.Base.Buffers
             return this;
         }
 
-        public void Unbind(BufferTarget target) => throw new NotImplementedException();
 
         public void Unbind() => EngineGL.Instance.UnbindBuffer(BufferTarget.PixelPackBuffer);
 
         [DllImport("kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
         public static extern void CopyMemory(IntPtr dest, IntPtr src, int count);
+
+        #region NotImplemented
+        public void Unbind(BufferTarget target) => throw new NotImplementedException();
+        public void Dispose() => throw new NotImplementedException();
+        public void Bind(BufferTarget target) => throw new NotImplementedException();
+
+        #endregion
 
     }
 }

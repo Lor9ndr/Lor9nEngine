@@ -64,7 +64,6 @@ namespace Lor9nEngine.Rendering.Base
 
                 //ProcessWithPBO(tex);
 
-
                 EngineGL.Instance
                     .SetShaderData($"material.{name}", i)
                     .SetShaderData(name, i);

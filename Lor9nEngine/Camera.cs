@@ -23,7 +23,7 @@ namespace Lor9nEngine
 
         public bool CanMove = true;
 
-        private readonly float _sensitivity = 0.2f;
+        private readonly float _sensitivity = 0.125f;
         private Keyboard? _keyboard;
 
         private Vector3 _up = Vector3.UnitY;
@@ -43,7 +43,7 @@ namespace Lor9nEngine
 
         public Model Model { get; set; }
         public List<IGameObject> Childrens { get; set; }
-        public IGameObject Parent { get; set; }
+        public IGameObject? Parent { get; set; }
         public ITransform Transform { get; set; }
 
 

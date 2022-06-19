@@ -97,6 +97,7 @@ namespace Lor9nEngine.Rendering.Animate
 
         public void Dispose()
         {
+            
         }
 
         void IRenderable.RenderWithOutTextures(Shader shader)

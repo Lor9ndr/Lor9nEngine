@@ -25,14 +25,15 @@ namespace Lor9nEngine.Rendering.Base
             EngineGL.Instance.UseShader(shader);
             ObjectSetupper.Render(shader);
         }
-        public virtual void RenderWithOutTextures(Shader shader)
-        {
-            throw new NotImplementedException();
-        }
 
         public virtual void Dispose()
         {
             ObjectSetupper.Dispose();
         }
+
+        #region NotImplemented  
+        public virtual void RenderWithOutTextures(Shader shader) => throw new NotImplementedException();
+
+        #endregion
     }
 }

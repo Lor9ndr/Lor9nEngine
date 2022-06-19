@@ -106,10 +106,9 @@ namespace Lor9nEngine.Rendering.Base
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-
-        void IRenderable.RenderWithOutTextures(Shader shader)
-        {
-            throw new NotImplementedException();
-        }
+        #region NotImplemented 
+        void IRenderable.RenderWithOutTextures(Shader shader) => throw new NotImplementedException();
+        
+        #endregion
     }
 }

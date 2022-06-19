@@ -10,14 +10,6 @@ namespace Lor9nEngine.Rendering.Base.Buffers
 
         public int Handle { get => _handle; set => _handle = value; }
 
-        public void Bind() => throw new NotImplementedException();
-
-        public void Dispose() => EngineGL.Instance.DeleteBuffer(this);
-        public void Unbind() => throw new NotImplementedException();
-        public IBufferVerticesObject Setup(Vertex[] vertices) => throw new NotImplementedException();
-
-        public IBufferVerticesObject Setup(Vertex[] vertices, int[] indices) => throw new NotImplementedException();
-
         public IBufferVerticesObject Setup(int[] indices)
         {
             EngineGL.Instance.GenBuffer(out _handle)
@@ -26,13 +18,19 @@ namespace Lor9nEngine.Rendering.Base.Buffers
             return this;
         }
 
+        public void Dispose() => EngineGL.Instance.DeleteBuffer(this);
         public void Bind(BufferTarget target) => EngineGL.Instance.BindBuffer(target, this);
-
         public void Unbind(BufferTarget target) => EngineGL.Instance.UnbindBuffer(target);
 
-        public IBufferObject Setup()
-        {
-            throw new NotImplementedException();
-        }
+        #region NotImplemented
+        public void Bind() => throw new NotImplementedException();
+        public void Unbind() => throw new NotImplementedException();
+
+        public IBufferObject Setup() => throw new NotImplementedException();
+        public IBufferVerticesObject Setup(Vertex[] vertices) => throw new NotImplementedException();
+
+        public IBufferVerticesObject Setup(Vertex[] vertices, int[] indices) => throw new NotImplementedException();
+        
+        #endregion
     }
 }

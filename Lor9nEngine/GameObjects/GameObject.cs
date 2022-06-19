@@ -47,12 +47,12 @@ namespace Lor9nEngine.GameObjects
                 item.Update();
             }
         }
-
         public async Task UpdateAsync()
         {
             await Transform.UpdateAsync();
             await Model.UpdateAsync();
         }
+
 
         public void Dispose()
         {

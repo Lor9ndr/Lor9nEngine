@@ -26,7 +26,6 @@ void main()
             vec4 localPosition = finalBonesMatrices[boneIds[i]] * vec4(aPos,1.0f);
             totalPosition +=  localPosition * weights[i];
         }
-        //vs_out.FragPos = vec3(model * vec4(totalPosition.xyz, 1.0f));
     }
     else
     {

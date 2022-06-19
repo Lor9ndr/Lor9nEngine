@@ -42,6 +42,7 @@ namespace Lor9nEngine.GameObjects.Lights
             LightData = lightData;
             Transform = new Transform(new Vector3(10), new Vector3(0), new Vector3(5));
             _parent = null;
+            Shadow = new DirectShadow(this);
         }
 
         public BaseLight(LightData lightData, Model model, Transform transform)

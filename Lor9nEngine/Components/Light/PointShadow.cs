@@ -62,6 +62,8 @@ namespace Lor9nEngine.Components.Light
             {
                 item.RenderWithOutTextures(DepthPointShader);
             }
+
+            FBO.Texture.Unbind();
             FBO.Unbind();
         }
         public override async Task UpdateAsync()
